@@ -1,0 +1,14 @@
+server:
+  port: 8080
+spring:
+  r2dbc:
+    url: "r2dbc:postgresql://localhost:5432/eboxdb"
+    username: "postgres"
+    password: "postgres"
+  application:
+    name: evox
+jwt:
+  secret: secretsecretsecretsecretsecretsecretsecretsecretsecret
+  expiration : 3600
+evox:
+  url: "https://evox/ref/"
