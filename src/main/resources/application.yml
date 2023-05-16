@@ -12,3 +12,6 @@ jwt:
   expiration : 3600
 evox:
   url: "https://evox/ref/"
+  email:
+    sender: "micafetalapp2022@gmail.com"
+    password : "azmpkduzsixvelso"

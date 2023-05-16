@@ -16,10 +16,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import javax.mail.internet.MimeMessage;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -32,8 +37,11 @@ public class AuthService {
     private final SessionRepository sessionRepository;
     @Value("${evox.url}")
     private  String url;
+    @Value("${evox.email.sender}")
+    private String emailUser;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mailSender;
 
     public Mono<TokenDto> login(LoginDto dto) {
         return authRepository.findByEmailIgnoreCase(dto.getEmail())
@@ -122,16 +130,15 @@ public class AuthService {
                 }).map(ele -> new Response(TypeStateResponse.Success , "password successfully updated"));
     }
     public Mono<Response> activateAccount(String token){
-       return authRepository.findByToken(token).
-                 filter(ele->ele.getStatus().equals(false))
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST , "the token is invalid " ,TypeStateResponse.Error)))
-                .flatMap(ele->{
-                    ele.setId(ele.getId());
-                    ele.setToken(null);
-                    ele.setStatus(true);
-                    ele.setEmailVerified(LocalDateTime.now());
-                    return authRepository.save(ele)
-                            .map(data->new Response(TypeStateResponse.Success , "successful account activation"));
+        return authRepository.findByToken(token)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "The token is invalid", TypeStateResponse.Error)))
+                .filter(user -> !user.getStatus())
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Account is already activated", TypeStateResponse.Warning)))
+                .flatMap(user -> {
+                    user.setStatus(true);
+                    user.setEmailVerified(LocalDateTime.now());
+                    return authRepository.save(user)
+                            .map(data -> new Response(TypeStateResponse.Success, "Successful account activation"));
                 });
 
     }
@@ -139,5 +146,13 @@ public class AuthService {
     private String extractUsername(String refLink) {
         int position = refLink.lastIndexOf('/');
         return refLink.substring(position + 1);
+    }
+    public void sendEmailWelcome(String email , String token){
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(emailUser);
+        mailMessage.setTo(email);
+        mailMessage.setSubject("Welcome To Evox");
+        mailMessage.setText(token);
+        mailSender.send(mailMessage);
     }
 }
