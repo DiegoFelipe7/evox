@@ -31,7 +31,7 @@ public class JwtProvider {
                 .claim("roles", userDetails.getAuthorities())
                 .claim("refLink" , user.getRefLink())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + expiration * 1000))
+                .setExpiration(new Date(new Date().getTime() + expiration * 2000))
                 .signWith(getKey(secret))
                 .compact();
     }
