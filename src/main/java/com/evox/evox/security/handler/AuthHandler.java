@@ -37,9 +37,7 @@ public class AuthHandler {
         return serverRequest.bodyToMono(User.class).doOnNext(objectValidator::validate)
                 .flatMap(ele -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(authService.accountRegistration(ele)
-
-                                , Response.class));
+                        .body(authService.accountRegistration(ele), Response.class));
     }
 
     public Mono<ServerResponse> passwordRecovery(ServerRequest serverRequest) {

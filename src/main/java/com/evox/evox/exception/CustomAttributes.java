@@ -1,5 +1,6 @@
 package com.evox.evox.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,5 +32,6 @@ public class CustomAttributes extends DefaultErrorAttributes {
             errorAttributes.put("typeStatus" , "Warning");
         }
         return errorAttributes;
+
     }
 }

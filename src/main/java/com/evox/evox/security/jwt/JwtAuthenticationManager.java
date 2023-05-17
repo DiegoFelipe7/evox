@@ -24,22 +24,24 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
     private final JwtProvider jwtProvider;
 
     @Override
-    public Mono<Authentication> authenticate(Authentication authentication) {
-        return Mono.just(authentication)
-                .map(auth -> jwtProvider.getClaims(auth.getCredentials().toString()))
-             //   .log()
-                .onErrorResume(e -> Mono.error(new CustomException(HttpStatus.UNAUTHORIZED, "bad token" , TypeStateResponse.Error)))
-                .map(claims -> new UsernamePasswordAuthenticationToken(
-                        claims.getSubject(),
-                        null,
-                        Stream.of(claims.get("roles"))
-                                .map(role -> (List<Map<String, String>>) role)
-                                .flatMap(role -> role.stream()
-                                        .map(r -> r.get("authority"))
-                                        .map(SimpleGrantedAuthority::new))
-                                .toList()
-                ));
-    }
+
+        public Mono<Authentication> authenticate (Authentication authentication){
+            return Mono.just(authentication)
+                    .map(auth -> jwtProvider.getClaims(auth.getCredentials().toString()))
+                    //.log()
+                    .onErrorResume(e -> Mono.error(new CustomException(HttpStatus.UNAUTHORIZED, "bad token", TypeStateResponse.Error)))
+                    .map(claims -> new UsernamePasswordAuthenticationToken(
+                            claims.getSubject(),
+                            null,
+                            Stream.of(claims.get("roles"))
+                                    .map(role -> (List<Map<String, String>>) role)
+                                    .flatMap(role -> role.stream()
+                                            .map(r -> r.get("authority"))
+                                            .map(SimpleGrantedAuthority::new))
+                                    .toList()
+                    ));
+        }
 
 
 }
+

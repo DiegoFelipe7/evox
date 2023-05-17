@@ -16,7 +16,7 @@ public class RouterUser {
     @Bean
     RouterFunction<ServerResponse> userRouter(UserHandler handler) {
         return RouterFunctions.route()
-                .GET(PATH + "unilevel", handler::unilevelUsers)
+                .GET(PATH +"unilevel", handler::unilevelUsers)
                 .build();
     }
 }

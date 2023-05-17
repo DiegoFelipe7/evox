@@ -12,18 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MultiLevelDto {
-    private String parent;
     private String refLink;
     private String userName;
-    private String fullName;
     private Boolean status;
     private LocalDateTime dateRegistered;
 
-    public MultiLevelDto(String refLink, String userName, String fullName, Boolean status, LocalDateTime dateRegistered) {
-        this.refLink = refLink;
-        this.userName = userName;
-        this.fullName = fullName;
-        this.status = status;
-        this.dateRegistered = dateRegistered;
-    }
+
 }

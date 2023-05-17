@@ -1,6 +1,7 @@
 package com.evox.evox.config;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 @Configuration
+@RequiredArgsConstructor
 public class MailConfiguration {
 
     @Value("${evox.email.sender}")
@@ -22,8 +24,7 @@ public class MailConfiguration {
     public JavaMailSender getJavaMailSender() {
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-
-        mailSender.setHost("smtp.gmail.com");
+        mailSender.setHost("smtp.zoho.com");
         mailSender.setPort(587);
         mailSender.setUsername(emailUser);
         mailSender.setPassword(password);
@@ -32,8 +33,10 @@ public class MailConfiguration {
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.zoho.com");
 
         return mailSender;
     }
 }
+
+
