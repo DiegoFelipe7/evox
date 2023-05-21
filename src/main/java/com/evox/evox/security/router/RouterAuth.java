@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Slf4j
 public class RouterAuth {
 
-    private static final String PATH = "auth/";
+    private static final String PATH = "api/auth/";
 
     @Bean
     RouterFunction<ServerResponse> authRouter(AuthHandler handler) {

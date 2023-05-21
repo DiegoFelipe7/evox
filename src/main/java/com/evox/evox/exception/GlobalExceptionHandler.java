@@ -37,4 +37,6 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         HttpStatus status = (HttpStatus) Optional.ofNullable(errorMap.get("status")).orElse(HttpStatus.INTERNAL_SERVER_ERROR);
         return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(errorMap));
     }
+
+
 }

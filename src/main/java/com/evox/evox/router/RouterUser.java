@@ -17,6 +17,7 @@ public class RouterUser {
     RouterFunction<ServerResponse> userRouter(UserHandler handler) {
         return RouterFunctions.route()
                 .GET(PATH +"unilevel", handler::unilevelUsers)
+                .PUT(PATH+"edit",handler::updateUser)
                 .build();
     }
 }

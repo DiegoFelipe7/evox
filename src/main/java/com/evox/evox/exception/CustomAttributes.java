@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,8 @@ public class CustomAttributes extends DefaultErrorAttributes {
             errorAttributes.put("message", message);
             errorAttributes.put("typeStatus" , "Warning");
         }
-        return errorAttributes;
 
+
+        return errorAttributes;
     }
 }

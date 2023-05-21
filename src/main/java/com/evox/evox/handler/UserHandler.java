@@ -1,6 +1,8 @@
 package com.evox.evox.handler;
 
 import com.evox.evox.dto.MultiLevelDto;
+import com.evox.evox.dto.TokenDto;
+import com.evox.evox.dto.UserDto;
 import com.evox.evox.services.UserServices;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,15 @@ public class UserHandler {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userServices.getAllMultilevel(token), MultiLevelDto.class);
-
-
     }
+
+    public Mono<ServerResponse> updateUser(ServerRequest serverRequest) {
+        return serverRequest
+                .bodyToMono(UserDto.class)
+                .flatMap(ele -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(userServices.editUser(ele), TokenDto.class));
+    }
+
+
 }

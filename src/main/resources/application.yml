@@ -2,9 +2,9 @@ server:
   port: 8080
 spring:
   r2dbc:
-    url: "r2dbc:postgresql://localhost:5432/eboxdb"
+    url: "r2dbc:postgresql://evoxprodb01.culzj05sqpfp.us-east-2.rds.amazonaws.com"
     username: "postgres"
-    password: "postgres"
+    password: "pv08UiLi11T76tbs$%qpvb1"
   application:
     name: evox
 jwt:
@@ -15,3 +15,12 @@ evox:
   email:
     sender: "corporate@evox.com.co"
     password : "Evoteam2022"
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          cors:
+            reactive:
+              DefaultCorsProcessor: debug

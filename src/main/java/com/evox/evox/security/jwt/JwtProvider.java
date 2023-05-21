@@ -30,8 +30,13 @@ public class JwtProvider {
                 .claim("state", userDetails.isEnabled())
                 .claim("roles", userDetails.getAuthorities())
                 .claim("refLink" , user.getRefLink())
+                .claim("email" , user.getEmail())
+                .claim("phone", user.getPhone())
+                .claim("country" , user.getCountry())
+                .claim("countryOfResidence" , user.getCountryOfResidence())
+                .claim("photo" , user.getPhoto())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + expiration * 2000))
+                .setExpiration(new Date(new Date().getTime() + expiration * 1000L))
                 .signWith(getKey(secret))
                 .compact();
     }

@@ -59,7 +59,7 @@ public class AuthService {
 
     public Mono<Response> accountRegistration(User user) {
         user.setRefLink(url + user.getUsername());
-        user.setRoles(Role.ROLE_USER.name());
+        user.setRoles(Role.ROLE_ADMIN.name());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         user.setToken(UUID.randomUUID().toString());
