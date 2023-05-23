@@ -2,16 +2,27 @@ server:
   port: 8080
 spring:
   r2dbc:
-    url: "r2dbc:postgresql://evoxprodb01.culzj05sqpfp.us-east-2.rds.amazonaws.com"
-    username: "postgres"
-    password: "pv08UiLi11T76tbs$%qpvb1"
+    url: r2dbc:postgresql://evoxprodb00.culzj05sqpfp.us-east-2.rds.amazonaws.com:5432/evoxbdprod00
+    username: evoxbdprod00
+    password: pv08UiLi11T76tbs$%qpvb0o
+
+
+
+
+#  r2dbc:
+#    url: "r2dbc:postgresql://evoxprodb00.culzj05sqpfp.us-east-2.rds.amazonaws.com:5432/evoxbdprod00"
+#    username: "evoxbdprod00"
+#    password: "pv08UiLi11T76tbs$%qpvb0o"
+  #    url: "r2dbc:postgresql://localhost:5432/eboxdb"
+#    username: "postgres"
+#    password: "postgres"
   application:
     name: evox
 jwt:
   secret: secretsecretsecretsecretsecretsecretsecretsecretsecret
   expiration : 3600
 evox:
-  url: "https://evox/ref/"
+  url: "https://www.backoffice.evox.com.co/"
   email:
     sender: "corporate@evox.com.co"
     password : "Evoteam2022"

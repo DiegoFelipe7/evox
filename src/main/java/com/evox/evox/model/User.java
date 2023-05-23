@@ -1,6 +1,5 @@
 package com.evox.evox.model;
 
-import com.evox.evox.model.enums.TypeOfIdentification;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -22,15 +21,13 @@ import java.util.stream.Stream;
 public class User implements UserDetails  {
     @Id
     private Integer id;
+    private String username;
     private String email;
     private String password;
-    private String username;
     private String fullName;
-    private TypeOfIdentification typeOfIdentification;
-    private String identification;
     private String phone;
     private String country;
-    private String countryOfResidence;
+    private String city;
     private LocalDateTime emailVerified;
     private String token;
     private String photo;
@@ -41,10 +38,6 @@ public class User implements UserDetails  {
     private Boolean status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    public String getTypeOfIdentification() {
-        return typeOfIdentification.getDescription();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -14,15 +14,15 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
     @Query(value = "WITH RECURSIVE user_tree AS (\n" +
             " SELECT *\n" +
             " FROM users\n" +
-            " WHERE username = :username\n" +
+            " WHERE email = :email\n" + // Modificado para buscar por email en lugar de username
             " UNION ALL\n" +
             " SELECT u.*\n" +
             " FROM users u\n" +
             " INNER JOIN user_tree ut ON u.parent_id = ut.id\n" +
             ")\n" +
             "SELECT * FROM user_tree")
-    Flux<User> findUserAndDescendants(@Param("username") String username);
+    Flux<User> findUserAndDescendants(@Param("email") String email);
 
-    Mono<User> findByUsername(String username);
+    Mono<User> findByEmail(String email);
 
 }

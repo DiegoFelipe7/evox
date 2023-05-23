@@ -63,23 +63,16 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         user.setToken(UUID.randomUUID().toString());
-        return authRepository.findAll()
-                .any(existingUser -> existingUser.getCountry().equals(user.getCountry()) && existingUser.getIdentification().equals(user.getIdentification()))
-                .flatMap(existingUser -> {
-                    if (Boolean.TRUE.equals(existingUser)) {
-                        return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "A user with this ID already exists in the same country.", TypeStateResponse.Error));
-                    }
-                    return multilevel(user);
-                });
-    }
-
-
-    public Mono<Response> multilevel(User user) {
         if (user.getInvitationLink() == null) {
             return authRepository.save(user)
                     .flatMap(ele -> emailService.sendEmailWelcome(ele.getEmail(), ele.getToken())
-                                .then(Mono.just(new Response(TypeStateResponse.Success, "We've sent an email to verify your account!" + ele.getFullName()))));
+                            .then(Mono.just(new Response(TypeStateResponse.Success, "We've sent an email to verify your account!" + ele.getFullName()))));
         }
+        return unilevel(user);
+    }
+
+
+    public Mono<Response> unilevel(User user) {
         return authRepository.findByUsernameIgnoreCase(extractUsername(user.getInvitationLink()))
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Reference link does not exist", TypeStateResponse.Warning)))
                 .flatMap(parent -> {
@@ -135,6 +128,7 @@ public class AuthService {
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Account is already activated", TypeStateResponse.Warning)))
                 .flatMap(user -> {
                     user.setStatus(true);
+                    user.setToken(null);
                     user.setEmailVerified(LocalDateTime.now());
                     return authRepository.save(user)
                             .map(data -> new Response(TypeStateResponse.Success, "Successful account activation"));

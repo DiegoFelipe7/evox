@@ -29,14 +29,14 @@ public class UserServices {
     }
 
     public Mono<TokenDto> editUser(UserDto userDto) {
-       return repository.findByUsername(userDto.getUsername())
+       return repository.findByEmail(userDto.getEmail())
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "An error occurred, please try again!", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setPhoto(userDto.getPhoto());
                     ele.setPhone(userDto.getPhone());
                     ele.setCountry(userDto.getCountry());
-                    ele.setCountryOfResidence(userDto.getCountryOfResidence());
+                    ele.setCity(userDto.getCity());
                      return repository.save(ele).map(data-> new TokenDto(jwtProvider.generateToken(data)));
                 });
     }

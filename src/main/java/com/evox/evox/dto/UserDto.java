@@ -13,12 +13,11 @@ import java.time.LocalDateTime;
 public class UserDto {
     private Integer id;
     private String username;
+    private String email;
     private String fullName;
-    private TypeOfIdentification typeOfIdentification;
-    private String identification;
     private String phone;
     private String country;
-    private String countryOfResidence;
+    private String city;
     private Boolean emailVerified;
     private String token;
     private String photo;
