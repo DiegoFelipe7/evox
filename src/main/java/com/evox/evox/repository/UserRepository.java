@@ -11,18 +11,19 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
 
-    @Query(value = "WITH RECURSIVE user_tree AS (\n" +
-            " SELECT *\n" +
-            " FROM users\n" +
-            " WHERE email = :email\n" + // Modificado para buscar por email en lugar de username
-            " UNION ALL\n" +
-            " SELECT u.*\n" +
-            " FROM users u\n" +
-            " INNER JOIN user_tree ut ON u.parent_id = ut.id\n" +
-            ")\n" +
-            "SELECT * FROM user_tree")
-    Flux<User> findUserAndDescendants(@Param("email") String email);
+    Mono<User> findByUsername(String username);
 
     Mono<User> findByEmail(String email);
 
+    @Query(value = "WITH RECURSIVE user_team AS (\n" +
+            "  SELECT u.id, u.full_name, u.phone, u.username, u.created_at, 0 AS level\n" +
+            "  FROM users u\n" +
+            "  WHERE u.username = :username\n" +
+            "  UNION ALL\n" +
+            "  SELECT u.id, u.full_name, u.phone, u.username, u.created_at, ut.level + 1 AS level\n" +
+            "  FROM users u\n" +
+            "  INNER JOIN user_team ut ON u.parent_id = ut.id\n" +
+            ")\n" +
+            "SELECT * FROM user_team;")
+    Flux<User> findUserAndDescendantsTeam(@Param("username") String username);
 }

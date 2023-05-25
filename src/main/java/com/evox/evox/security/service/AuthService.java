@@ -38,15 +38,15 @@ public class AuthService {
 
     public Mono<TokenDto> login(LoginDto dto) {
         return authRepository.findByEmailIgnoreCase(dto.getEmail())
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "user is not registered", TypeStateResponse.Error)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario no esta registrado!", TypeStateResponse.Error)))
                 .filter(user -> passwordEncoder.matches(dto.getPassword(), user.getPassword()))
                 .flatMap(user -> {
                     if (Boolean.TRUE.equals(user.getStatus())) {
                         return entryRegister(dto).map(ele -> new TokenDto(jwtProvider.generateToken(user)));
                     }
-                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "inactive user", TypeStateResponse.Warning));
+                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario tiene la cuenta inactiva", TypeStateResponse.Warning));
                 })
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "bad credentials", TypeStateResponse.Error)));
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Contraseña invalida!", TypeStateResponse.Error)));
     }
 
     public Mono<Session> entryRegister(LoginDto dto) {
@@ -65,21 +65,21 @@ public class AuthService {
         user.setToken(UUID.randomUUID().toString());
         if (user.getInvitationLink() == null) {
             return authRepository.save(user)
-                    .flatMap(ele -> emailService.sendEmailWelcome(ele.getEmail(), ele.getToken())
-                            .then(Mono.just(new Response(TypeStateResponse.Success, "We've sent an email to verify your account!" + ele.getFullName()))));
+                    .flatMap(ele -> emailService.sendEmailWelcome(ele.getFullName(),ele.getEmail(), ele.getToken())
+                            .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para verificar su tu cuenta!" + ele.getFullName()))));
         }
-        return unilevel(user);
+        return referral(user);
     }
 
 
-    public Mono<Response> unilevel(User user) {
+    public Mono<Response> referral(User user) {
         return authRepository.findByUsernameIgnoreCase(extractUsername(user.getInvitationLink()))
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Reference link does not exist", TypeStateResponse.Warning)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
                 .flatMap(parent -> {
                     user.setParentId(parent.getId());
                     return authRepository.save(user).flatMap(ele ->
-                         emailService.sendEmailWelcome(ele.getEmail(), ele.getToken())
-                                .then(Mono.just(new Response(TypeStateResponse.Success, "We've sent an email to verify your account!" + ele.getFullName()))));
+                         emailService.sendEmailWelcome(ele.getFullName(),ele.getEmail(), ele.getToken())
+                                .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para verificar su tu cuenta!!" + ele.getFullName()))));
                 });
 
     }
@@ -90,9 +90,9 @@ public class AuthService {
 
     public Mono<Response> passwordRecovery(LoginDto email) {
         return authRepository.findByEmailIgnoreCase(email.getEmail())
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "user is not registered", TypeStateResponse.Error)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario no se encuentra registrado!", TypeStateResponse.Error)))
                 .filter(User::getStatus)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "You do not have a verified account", TypeStateResponse.Warning)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No tienes tu cuenta verificada", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setToken(UUID.randomUUID().toString());
@@ -111,27 +111,27 @@ public class AuthService {
 
     public Mono<Response> passwordChange(String token, LoginDto dto) {
         return authRepository.findByToken(token)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.NOT_FOUND, "Sorry this token is invalid", TypeStateResponse.Error)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.NOT_FOUND, "Lo sentimos, el token es invalido!", TypeStateResponse.Error)))
                 .flatMap(ele -> {
                     String encodedPassword = passwordEncoder.encode(dto.getPassword());
                     ele.setId(ele.getId());
                     ele.setPassword(encodedPassword);
                     ele.setToken(null);
                     return authRepository.save(ele);
-                }).map(ele -> new Response(TypeStateResponse.Success, "password successfully updated"));
+                }).map(ele -> new Response(TypeStateResponse.Success, "Contraseña actualizada!"));
     }
 
     public Mono<Response> activateAccount(String token) {
         return authRepository.findByToken(token)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "The token is invalid", TypeStateResponse.Error)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El token es invalido!", TypeStateResponse.Error)))
                 .filter(user -> !user.getStatus())
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Account is already activated", TypeStateResponse.Warning)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "La cuenta ya esta activa!", TypeStateResponse.Warning)))
                 .flatMap(user -> {
                     user.setStatus(true);
                     user.setToken(null);
                     user.setEmailVerified(LocalDateTime.now());
                     return authRepository.save(user)
-                            .map(data -> new Response(TypeStateResponse.Success, "Successful account activation"));
+                            .map(data -> new Response(TypeStateResponse.Success, "Activación correcta de la cuenta"));
                 });
 
     }

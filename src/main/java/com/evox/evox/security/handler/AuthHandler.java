@@ -74,11 +74,11 @@ public class AuthHandler {
         }
     }
 
-    public Mono<ServerResponse> activateAccount(ServerRequest serverRequest){
+    public Mono<ServerResponse> activateAccount(ServerRequest serverRequest) {
         String token = serverRequest.pathVariable("token");
-        return  ServerResponse.ok()
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.activateAccount(token) , Response.class);
+                .body(authService.activateAccount(token), Response.class);
     }
 
 }

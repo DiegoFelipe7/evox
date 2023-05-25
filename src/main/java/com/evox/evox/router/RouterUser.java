@@ -16,7 +16,8 @@ public class RouterUser {
     @Bean
     RouterFunction<ServerResponse> userRouter(UserHandler handler) {
         return RouterFunctions.route()
-                .GET(PATH +"unilevel", handler::unilevelUsers)
+                .GET(PATH +"referrals", handler::referrals)
+                .GET(PATH +"referrals/team", handler::referralsTeam)
                 .PUT(PATH+"edit",handler::updateUser)
                 .build();
     }

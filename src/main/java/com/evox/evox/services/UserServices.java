@@ -1,7 +1,7 @@
 package com.evox.evox.services;
 
 
-import com.evox.evox.dto.MultiLevelDto;
+import com.evox.evox.dto.ReferralsDto;
 import com.evox.evox.dto.TokenDto;
 import com.evox.evox.dto.UserDto;
 import com.evox.evox.exception.CustomException;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +23,26 @@ public class UserServices {
     private final UserRepository repository;
     private final JwtProvider jwtProvider;
 
-    public Flux<MultiLevelDto> getAllMultilevel(String token) {
-        var userName = jwtProvider.extractToken(token);
-        return repository.findUserAndDescendants(userName)
-                .map(data -> new MultiLevelDto(data.getRefLink(), data.getUsername(), data.getStatus(), data.getCreatedAt()))
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "An error has occurred, please contact the administrator", TypeStateResponse.Error)));
+    public Flux<ReferralsDto> getAllReferrals(String token) {
+        String userName = jwtProvider.extractToken(token);
+        return repository.findByUsername(userName)
+                .flatMapMany(user -> repository.findAll()
+                        .filter(ele -> Objects.equals(ele.getParentId(), user.getId()))
+                        .filter(ele -> !ele.getUsername().equals(userName))
+                        .map(data -> new ReferralsDto(data.getFullName(), data.getPhone(), data.getUsername(), data.getCreatedAt())));
     }
+
+    public Flux<ReferralsDto> getAllReferralsTeam(String token) {
+        String userName = jwtProvider.extractToken(token);
+        return repository.findUserAndDescendantsTeam(userName)
+                .filter(ele->!ele.getUsername().equals(userName))
+                .map(data -> new ReferralsDto(data.getFullName(), data.getLevel(), data.getUsername(), data.getCreatedAt()));
+    }
+
 
     public Mono<TokenDto> editUser(UserDto userDto) {
        return repository.findByEmail(userDto.getEmail())
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "An error occurred, please try again!", TypeStateResponse.Warning)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Se ha producido un error, inténtelo de nuevo.", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setPhoto(userDto.getPhoto());

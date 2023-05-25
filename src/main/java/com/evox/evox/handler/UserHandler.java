@@ -1,6 +1,6 @@
 package com.evox.evox.handler;
 
-import com.evox.evox.dto.MultiLevelDto;
+import com.evox.evox.dto.ReferralsDto;
 import com.evox.evox.dto.TokenDto;
 import com.evox.evox.dto.UserDto;
 import com.evox.evox.services.UserServices;
@@ -20,13 +20,18 @@ public class UserHandler {
 
     private final UserServices userServices;
 
-    public Mono<ServerResponse> unilevelUsers(ServerRequest serverRequest) {
+    public Mono<ServerResponse> referrals(ServerRequest serverRequest) {
         String token = serverRequest.headers().firstHeader("Authorization");
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userServices.getAllMultilevel(token), MultiLevelDto.class);
+                .body(userServices.getAllReferrals(token), ReferralsDto.class);
     }
-
+    public Mono<ServerResponse> referralsTeam(ServerRequest serverRequest) {
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userServices.getAllReferralsTeam(token), ReferralsDto.class);
+    }
     public Mono<ServerResponse> updateUser(ServerRequest serverRequest) {
         return serverRequest
                 .bodyToMono(UserDto.class)

@@ -36,6 +36,7 @@ public class User implements UserDetails  {
     private String  roles;
     private Integer parentId;
     private Boolean status;
+    private Integer level;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

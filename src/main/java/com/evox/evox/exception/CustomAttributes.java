@@ -27,7 +27,7 @@ public class CustomAttributes extends DefaultErrorAttributes {
             errorAttributes.put("typeStatus" , customException.getTypeStatus());
         }
         if (throwable instanceof DataIntegrityViolationException) {
-            String message = "The e-mail address or user is already registered";
+            String message = "El email o nombre de usuario ya se encuentran registrados!";
             errorAttributes.put("status", HttpStatus.BAD_REQUEST);
             errorAttributes.put("message", message);
             errorAttributes.put("typeStatus" , "Warning");
