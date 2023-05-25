@@ -1,13 +1,8 @@
 spring:
   r2dbc:
-    url: "r2dbc:postgresql://ec2-3-218-172-130.compute-1.amazonaws.com/d1qjtlqi5452dr"
-    username: "noqprqyfuskano"
-    password: "3e7bdf11722ee4f298148d8b6656eff6bd11c3dc0c0b8e540776b238715ad6dd"
-
-  #r2dbc:
-    #url: "r2dbc:postgresql://3.140.1.248:5432/evox-prod"
-    #username: "postgres"
-    #password: "evoxproduccion"
+    url: "r2dbc:postgresql://3.140.1.248:5432/evox-prod"
+    username: "postgres"
+    password: "evoxproduccion"
   application:
     name: evox
 jwt:
