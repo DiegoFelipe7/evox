@@ -15,7 +15,6 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
 
 @Service
 public class EmailService {
@@ -42,7 +41,7 @@ public class EmailService {
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
                 helper.setFrom(emailSender);
-                helper.setSubject("Welcome To evox");
+                helper.setSubject("Bienvenido a evox");
                 helper.setTo(email);
                 helper.setText(htmlContent, true);
                 mailSender.send(message);
@@ -52,17 +51,18 @@ public class EmailService {
         }).subscribeOn(scheduler).then();
     }
 
-    public Mono<Void> sendEmailRecoverPassword(String email, String token) {
+    public Mono<Void> sendEmailRecoverPassword(String fullName,String email, String token) {
         return Mono.fromRunnable(() -> {
             try {
                 Context context = new Context();
                 context.setVariable("token", token); // Establece las variables necesarias para la plantilla
+                context.setVariable("fullName" , fullName);
                 String htmlContent = templateEngine.process("recoverPassword", context);
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
                 helper.setFrom(emailSender);
                 helper.setTo(email);
-                helper.setSubject("Password change request");
+                helper.setSubject("Restablecimiento de contraseña");
                 helper.setText(htmlContent, true); // Establece el contenido del correo electrónico como HTML
                 mailSender.send(message);
             } catch (Exception e) {

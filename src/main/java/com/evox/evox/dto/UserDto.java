@@ -1,5 +1,4 @@
 package com.evox.evox.dto;
-import com.evox.evox.model.enums.TypeOfIdentification;
 import lombok.*;
 
 import java.time.LocalDateTime;

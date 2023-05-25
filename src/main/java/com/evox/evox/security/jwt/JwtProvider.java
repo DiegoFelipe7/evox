@@ -1,6 +1,7 @@
 package com.evox.evox.security.jwt;
 
 import com.evox.evox.model.User;
+import com.evox.evox.utils.Utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -21,25 +22,27 @@ public class JwtProvider {
     private String secret;
     @Value("${jwt.expiration}")
     private int expiration;
-
     public String generateToken(UserDetails userDetails) {
         var user = (User) userDetails;
+        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
+        claims.put("fullName", user.getFullName());
+        claims.put("state", userDetails.isEnabled());
+        claims.put("roles", userDetails.getAuthorities());
+        claims.put("refLink", user.getRefLink());
+        claims.put("phone", user.getPhone());
+        claims.put("email", user.getEmail());
+        claims.put("country", user.getCountry());
+        claims.put("city", user.getCity());
+        claims.put("photo", user.getPhoto());
+        claims.put("sponsorName", user.getInvitationLink() != null ? Utils.extractUsername(user.getInvitationLink()) : null);
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim("fullName" , user.getFullName())
-                .claim("state", userDetails.isEnabled())
-                .claim("roles", userDetails.getAuthorities())
-                .claim("refLink" , user.getRefLink())
-                .claim("phone", user.getPhone())
-                .claim("email", user.getEmail())
-                .claim("country" , user.getCountry())
-                .claim("city" , user.getCity())
-                .claim("photo" , user.getPhoto())
+                .setClaims(claims)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + expiration * 1000L))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                 .signWith(getKey(secret))
                 .compact();
     }
+
 
     public Claims getClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(getKey(secret)).build().parseClaimsJws(token).getBody();

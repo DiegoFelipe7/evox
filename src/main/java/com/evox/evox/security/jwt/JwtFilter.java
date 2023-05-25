@@ -23,7 +23,7 @@ public class JwtFilter implements WebFilter {
         ServerHttpResponse response = exchange.getResponse();
 
         if (CorsUtils.isPreFlightRequest(request)) {
-            response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173");
+            response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT, DELETE, OPTIONS");
             response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
             response.setStatusCode(HttpStatus.OK);
@@ -35,10 +35,10 @@ public class JwtFilter implements WebFilter {
         }
         String auth = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (auth == null) {
-            return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "no token was found", TypeStateResponse.Error));
+            return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "no se ha encontrado ningún token", TypeStateResponse.Error));
         }
         if (!auth.startsWith("Bearer ")) {
-            return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "invalid auth", TypeStateResponse.Error));
+            return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "autentificación inválida", TypeStateResponse.Error));
         }
         String token = auth.replace("Bearer ", "");
         exchange.getAttributes().put("token", token);

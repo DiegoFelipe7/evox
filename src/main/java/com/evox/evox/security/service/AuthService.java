@@ -11,6 +11,7 @@ import com.evox.evox.repository.SessionRepository;
 import com.evox.evox.security.jwt.JwtProvider;
 import com.evox.evox.security.repository.AuthRepository;
 import com.evox.evox.utils.Response;
+import com.evox.evox.utils.Utils;
 import com.evox.evox.utils.enums.TypeStateResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class AuthService {
     private final EmailService emailService;
     @Value("${evox.url}")
     private String url;
-
+    private Utils utils;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -73,7 +74,7 @@ public class AuthService {
 
 
     public Mono<Response> referral(User user) {
-        return authRepository.findByUsernameIgnoreCase(extractUsername(user.getInvitationLink()))
+        return authRepository.findByUsernameIgnoreCase(Utils.extractUsername(user.getInvitationLink()))
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
                 .flatMap(parent -> {
                     user.setParentId(parent.getId());
@@ -98,8 +99,8 @@ public class AuthService {
                     ele.setToken(UUID.randomUUID().toString());
                     return authRepository.save(ele)
                             .flatMap(data->
-                                 emailService.sendEmailRecoverPassword( data.getEmail() , data.getToken())
-                                        .then(Mono.just(new Response(TypeStateResponse.Success, "We sent an email with the option to update your password."))));
+                                 emailService.sendEmailRecoverPassword(data.getFullName(), data.getEmail() , data.getToken())
+                                        .then(Mono.just(new Response(TypeStateResponse.Success, "se envió un correo electrónico con la opción de actualizar su contraseña."))));
                 });
     }
 
@@ -135,10 +136,7 @@ public class AuthService {
                 });
 
     }
-    private String extractUsername(String refLink) {
-        int position = refLink.lastIndexOf('/');
-        return refLink.substring(position + 1);
-    }
+
 
 
 }
