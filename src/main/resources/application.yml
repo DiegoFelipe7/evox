@@ -1,15 +1,15 @@
 spring:
   r2dbc:
-    url: "r2dbc:postgresql://3.140.1.248:5432/evox-prod"
-    username: "postgres"
-    password: "evoxproduccion"
+    url: r2dbc:postgresql://${URL_DATABASE}
+    username: ${USERNAME}
+    password: ${PASSWORD}
   application:
     name: evox
 jwt:
   secret: secretsecretsecretsecretsecretsecretsecretsecretsecret
   expiration : 3600
 evox:
-  url: "https://www.backoffice.evox.com.co/"
+  url: https://backoffice.evox.com.co/
   email:
-    sender: "corporate@evox.com.co"
-    password : "Evoteam2022"
+    sender: corporate@evox.com.co
+    password : Evoteam2022
