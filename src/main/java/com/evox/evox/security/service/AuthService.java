@@ -64,9 +64,7 @@ public class AuthService {
         user.setPassword(encodedPassword);
         user.setToken(UUID.randomUUID().toString());
         if (user.getInvitationLink() == null) {
-            return authRepository.save(user)
-                    .flatMap(ele -> emailService.sendEmailWelcome(ele.getFullName(),ele.getEmail(), ele.getToken())
-                            .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para verificar su tu cuenta!" + ele.getFullName()))));
+            return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Necesitas un link de referido para tu registro!", TypeStateResponse.Warning));
         }
         return referral(user);
     }

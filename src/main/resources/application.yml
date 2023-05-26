@@ -12,4 +12,4 @@ evox:
   url: https://backoffice.evox.com.co/
   email:
     sender: corporate@evox.com.co
-    password : Evoteam2022
+    password : ${PASSWORD_EMAIL}
