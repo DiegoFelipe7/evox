@@ -71,7 +71,7 @@ public class AuthService {
 
 
     public Mono<Response> referral(User user) {
-        return authRepository.findByUsernameIgnoreCase(Utils.extractUsername(user.getInvitationLink()))
+        return authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
                 .flatMap(parent -> {
                     user.setParentId(parent.getId());

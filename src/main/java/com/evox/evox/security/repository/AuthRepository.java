@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface AuthRepository extends ReactiveCrudRepository<User, Integer> {
 
-    Mono<User> findByUsernameIgnoreCase(String username);
+    Mono<User> findByUsername(String username);
     Mono<User> findByEmailIgnoreCase(String email);
 
     Mono<User> findByToken(String token);
