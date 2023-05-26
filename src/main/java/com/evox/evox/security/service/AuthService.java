@@ -33,7 +33,6 @@ public class AuthService {
     private final EmailService emailService;
     @Value("${evox.url}")
     private String url;
-    private Utils utils;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -97,6 +96,7 @@ public class AuthService {
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setToken(UUID.randomUUID().toString());
+                    ele.setPassword(UUID.randomUUID().toString());
                     return authRepository.save(ele)
                             .flatMap(data->
                                  emailService.sendEmailRecoverPassword(data.getFullName(), data.getEmail() , data.getToken())
