@@ -27,7 +27,7 @@
     }
 
     body {
-        font-family: "Poppins", sans-serif;
+        font-family: 'Poppins', sans-serif;
         font-size: 16px;
         background-color: var(--primary-color);
         display: flex;
@@ -64,25 +64,10 @@
         padding: 3rem;
     }
 
-    .btn-activate-account {
-        padding: 1rem 3rem;
-        background-color: var(--blue);
-        color: var(--white);
-        font-weight: 500;
-        text-align: center;
-        border: none;
-        border-radius: 0.5rem;
-        font-size: 1.2rem;
-        transition: background-color 0.3s ease-in;
-        cursor: pointer;
-        text-decoration: none;
-    }
 
-    .btn-activate-account:hover {
-        background-color: var(--lightBlue);
-    }
     .footer {
         width: 100%;
+        margin-top: 1rem;
         height: 5rem;
         background-color: var(--primary-color);
         display: flex;
@@ -126,7 +111,17 @@
         objetivos. Estamos emocionados de acompañarte en este viaje de
         transformación.
     </p>
-    <a th:href="@{https://backoffice.evox.com.co/activateAccount/{token}(token=${token})}" class="btn-activate-account" type="button">
+    <a style="padding: 0.5rem 3rem;
+        background-color: #0f54eb;
+        color: #ffffff;
+        font-weight: 500;
+        text-align: center;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1.2rem;
+        transition: background-color 0.3s ease-in;
+        cursor: pointer;
+        text-decoration: none;" th:href="@{https://backoffice.evox.com.co/activateAccount/{token}(token=${token})}" >
         Activar cuenta
     </a>
     <footer class="footer">

@@ -44,7 +44,7 @@ public class AuthService {
                     if (Boolean.TRUE.equals(user.getStatus())) {
                         return entryRegister(dto).map(ele -> new TokenDto(jwtProvider.generateToken(user)));
                     }
-                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario tiene la cuenta inactiva", TypeStateResponse.Warning));
+                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario tiene la cuenta inactiva , verifica tu correo electronico y activa tu cuenta", TypeStateResponse.Warning));
                 })
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Contraseña invalida!", TypeStateResponse.Error)));
     }
@@ -77,7 +77,7 @@ public class AuthService {
                     user.setParentId(parent.getId());
                     return authRepository.save(user).flatMap(ele ->
                          emailService.sendEmailWelcome(ele.getFullName(),ele.getEmail(), ele.getToken())
-                                .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para verificar su tu cuenta!!" + ele.getFullName()))));
+                                .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
                 });
 
     }
