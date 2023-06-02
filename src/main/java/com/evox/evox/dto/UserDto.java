@@ -1,4 +1,5 @@
 package com.evox.evox.dto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,17 +14,22 @@ public class UserDto {
     private Integer id;
     private String username;
     private String email;
+    @JsonIgnore
+    private String password;
     private String fullName;
     private String phone;
     private String country;
     private String city;
-    private Boolean emailVerified;
+    private LocalDateTime emailVerified;
     private String token;
     private String photo;
     private String refLink;
     private String invitationLink;
     private String  roles;
-    private Boolean state;
+    @JsonIgnore
+    private Integer parentId;
+    private Boolean status;
+    private Integer level;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

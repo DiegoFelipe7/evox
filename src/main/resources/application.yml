@@ -1,8 +1,11 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://${URL_DATABASE}
-    username: ${USERNAME}
-    password: ${PASSWORD}
+    url: "r2dbc:postgresql://localhost:5432/eboxdb"
+    username: "postgres"
+    password: "postgres"
+    # url: r2dbc:postgresql://${URL_DATABASE}
+    # username: ${USERNAME}
+    # password: ${PASSWORD}
   application:
     name: evox
 jwt:
@@ -12,4 +15,5 @@ evox:
   url: https://backoffice.evox.com.co/
   email:
     sender: corporate@evox.com.co
-    password : ${PASSWORD_EMAIL}
+    password: Evoteam2022
+    #password : ${PASSWORD_EMAIL}

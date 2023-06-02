@@ -69,12 +69,13 @@ public class AuthService {
         return referral(user);
     }
 
-
+    //TODO:CAMBIE EL NIVEL TOMA EL DEL PADRE Y LE SUMA UNO
     public Mono<Response> referral(User user) {
         return authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
                 .flatMap(parent -> {
                     user.setParentId(parent.getId());
+                    //user.setLevel(parent.getLevel()+1);
                     return authRepository.save(user).flatMap(ele ->
                          emailService.sendEmailWelcome(ele.getFullName(),ele.getEmail(), ele.getToken())
                                 .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));

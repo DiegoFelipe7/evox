@@ -34,7 +34,7 @@ public class AuthHandler {
     }
 
     public Mono<ServerResponse> create(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(User.class).doOnNext(objectValidator::validate)
+        return serverRequest.bodyToMono(User.class)
                 .flatMap(ele -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(authService.accountRegistration(ele), Response.class));
