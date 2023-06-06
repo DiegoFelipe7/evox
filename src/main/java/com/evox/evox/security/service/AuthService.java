@@ -19,7 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -71,17 +74,29 @@ public class AuthService {
 
     //TODO:CAMBIE EL NIVEL TOMA EL DEL PADRE Y LE SUMA UNO
     public Mono<Response> referral(User user) {
-        return authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
-                .flatMap(parent -> {
-                    user.setParentId(parent.getId());
-                    //user.setLevel(parent.getLevel()+1);
-                    return authRepository.save(user).flatMap(ele ->
-                         emailService.sendEmailWelcome(ele.getFullName(),ele.getEmail(), ele.getToken())
-                                .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
-                });
+        return authRepository.findByEmailIgnoreCase(user.getEmail())
+                .flatMap(ele -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Este correo ya se encuentra registrado", TypeStateResponse.Error))
+                        .flatMap(data->
+                            authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
+                                    .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
+                                    .flatMap(parent -> {
+                                        user.setParentId(parent.getId());
+                                        return authRepository.save(user).flatMap(res ->
+                                                emailService.sendEmailWelcome(res.getFullName(), res.getEmail(), res.getToken())
+                                                        .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
+                                    })));
+//                        var data = authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
+//                                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
+//                                .flatMap(parent -> {
+//                                    user.setParentId(parent.getId());
+//                                    //user.setLevel(parent.getLevel()+1);
+//                                    return authRepository.save(user).flatMap(ele ->
+//                                            emailService.sendEmailWelcome(ele.getFullName(), ele.getEmail(), ele.getToken())
+//                                                    .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
+//                                });
 
     }
+
     public Mono<Boolean> validateToken(String token) {
         return Mono.just(jwtProvider.validate(token));
     }
@@ -95,11 +110,12 @@ public class AuthService {
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setToken(UUID.randomUUID().toString());
-                    ele.setPassword(UUID.randomUUID().toString());
+                    String password = passwordEncoder.encode(UUID.randomUUID().toString());
+                    ele.setPassword(password);
                     return authRepository.save(ele)
-                            .flatMap(data->
-                                 emailService.sendEmailRecoverPassword(data.getFullName(), data.getEmail() , data.getToken())
-                                        .then(Mono.just(new Response(TypeStateResponse.Success, "se envió un correo electrónico con la opción de actualizar su contraseña."))));
+                            .flatMap(data ->
+                                    emailService.sendEmailRecoverPassword(data.getFullName(), data.getEmail(), data.getToken())
+                                            .then(Mono.just(new Response(TypeStateResponse.Success, "se envió un correo electrónico con la opción de actualizar su contraseña."))));
                 });
     }
 
@@ -135,7 +151,15 @@ public class AuthService {
                 });
 
     }
+    //:TODO ENVIO MASIVO
 
-
+    public Flux<Response> resendEmail() {
+        return authRepository.findAll()
+                .filter(ele -> ele.getToken() != null && ele.getEmailVerified() == null)
+                .skip(187)
+                .delayElements(Duration.ofSeconds(60))
+                .flatMap(ele -> emailService.sendEmailWelcome(ele.getFullName(), ele.getEmail(), ele.getToken())
+                        .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
+    }
 
 }

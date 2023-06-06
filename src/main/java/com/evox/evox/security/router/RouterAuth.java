@@ -24,6 +24,7 @@ public class RouterAuth {
                 .GET(PATH+"validate" , handler::validateBearerToken)
                 .GET(PATH+"activateAccount/{token}" , handler::activateAccount)
                 .PATCH(PATH+"passwordChange/{token}" ,handler::passwordChange)
+                .GET(PATH+"sendEmail", handler::send)
                 .build();
     }
 }

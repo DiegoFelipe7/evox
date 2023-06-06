@@ -73,7 +73,6 @@ public class AuthHandler {
             return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Token invalid", TypeStateResponse.Error));
         }
     }
-
     public Mono<ServerResponse> activateAccount(ServerRequest serverRequest) {
         String token = serverRequest.pathVariable("token");
         return ServerResponse.ok()
@@ -81,4 +80,9 @@ public class AuthHandler {
                 .body(authService.activateAccount(token), Response.class);
     }
 
+    public Mono<ServerResponse> send (ServerRequest serverRequest){
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(authService.resendEmail(), Response.class);
+    }
 }

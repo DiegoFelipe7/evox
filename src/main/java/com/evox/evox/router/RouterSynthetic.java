@@ -18,9 +18,12 @@ public class RouterSynthetic {
     RouterFunction<ServerResponse> syntheticRouter(SyntheticHandler handler) {
         return RouterFunctions.route()
                 .GET(PATH +"list", handler::getAllSyntheticsUsers)
-                .POST(PATH+"save",handler::saveSynthetic)
+                .GET(PATH+"accountStatus" , handler::accountStatusSynthetic)
+                .GET(PATH+"transaction" , handler::getSyntheticId)
                 .PATCH(PATH+"active/{transaction}" , handler::activateAccount)
+                .PATCH(PATH+"invalid/{transaction}" , handler::invalidTransaction)
                 .POST(PATH+"transaction" , handler::registrationTransaction)
+                .POST(PATH+"registerAccount" , handler::registerAccount)
                 .build();
     }
 }

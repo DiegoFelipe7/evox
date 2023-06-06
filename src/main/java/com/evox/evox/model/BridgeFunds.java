@@ -1,27 +1,29 @@
 package com.evox.evox.model;
+
+
 import com.evox.evox.model.enums.AccountState;
-import lombok.*;
-import org.springframework.data.annotation.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
-@Table(name = "synthetics")
-public class Synthetics {
-    @Id
+@Table(name = "bridge_funds")
+public class BridgeFunds {
     private Integer id;
-    private String type;
     private String transaction;
-    private String currency;
-    private Integer price=15;
-    private LocalDateTime activationDate;
-    private LocalDateTime expirationDate;
+    private Integer quantity;
+    private BigDecimal total;
     private Integer userId;
-    private AccountState syntheticState;
+    private Integer bridgeAccountType;
+    private AccountState bridgeFundsState;
     private Boolean state;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -1,6 +1,7 @@
 package com.evox.evox.exception;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.modelmapper.MappingException;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.dao.DataIntegrityViolationException;

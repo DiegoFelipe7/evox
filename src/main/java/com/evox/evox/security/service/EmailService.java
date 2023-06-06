@@ -46,6 +46,7 @@ public class EmailService {
                 helper.setText(htmlContent, true);
                 mailSender.send(message);
             } catch (Exception e) {
+                System.out.println(e);
                 Mono.error(new CustomException(HttpStatus.BAD_REQUEST, e.getMessage(), TypeStateResponse.Error));
             }
         }).subscribeOn(scheduler).then();

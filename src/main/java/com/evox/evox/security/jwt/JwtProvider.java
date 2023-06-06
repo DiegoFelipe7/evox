@@ -35,6 +35,7 @@ public class JwtProvider {
         claims.put("city", user.getCity());
         claims.put("photo", user.getPhoto());
         claims.put("sponsorName", user.getInvitationLink() != null ? Utils.extractUsername(user.getInvitationLink()) : null);
+        claims.put("accountSynthetic" , user.getAccountSynthetics() !=null ? user.getAccountSynthetics() : null);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date())
