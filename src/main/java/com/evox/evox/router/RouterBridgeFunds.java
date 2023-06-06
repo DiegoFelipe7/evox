@@ -17,6 +17,11 @@ public class RouterBridgeFunds {
     RouterFunction<ServerResponse> bridgeFundsRouter(BridgeFundsHandler handler) {
         return RouterFunctions.route()
                 .GET(PATH +"list", handler::getAllBridgeAccountType)
+                .GET(PATH+"accountStatus" , handler::accountStatusBridgeFunds)
+                .GET(PATH+"list/users" , handler::getAllBridgeFundsUsers)
+                .POST(PATH+"transaction" , handler::registrationTransaction)
+                .PATCH(PATH+"active/{transaction}" , handler::activateAccount)
+                .PATCH(PATH+"invalid/{transaction}" , handler::invalidTransaction)
                 .build();
     }
 }

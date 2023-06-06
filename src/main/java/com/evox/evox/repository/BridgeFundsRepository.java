@@ -6,5 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface BridgeFundsRepository extends ReactiveCrudRepository<BridgeFunds, Integer> {
 
-    Mono<BridgeFunds> findByTransaction(String transaction);
+    Mono<BridgeFunds> findByTransactionEqualsIgnoreCase(String transaction);
 }

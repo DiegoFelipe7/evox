@@ -27,6 +27,20 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
             "SELECT * FROM user_team;")
     Flux<User> findUserAndDescendantsTeam(@Param("username") String username);
 
+    @Query(value = "WITH RECURSIVE user_team AS (\n" +
+            "  SELECT u.id, u.full_name, u.phone, u.username, u.created_at, u.parent_id, 0 AS level\n" +
+            "  FROM users u\n" +
+            "  WHERE u.username = :username\n" +
+            "  UNION ALL\n" +
+            "  SELECT u.id, u.full_name, u.phone, u.username, u.created_at, u.parent_id, ut.level + 1 AS level\n" +
+            "  FROM users u\n" +
+            "  INNER JOIN user_team ut ON u.id = ut.parent_id\n" +
+            ")\n" +
+            "SELECT * FROM user_team\n" +
+            "WHERE level <= :level;")
+    Flux<User> findUserAndParents(@Param("username") String username , @Param("level") Integer level);
+
+
     //:TODO METODO PARA CAMBIO DE NIVELES ELIMINAR
    /* @Query(value = "WITH RECURSIVE user_team AS (\n" +
             "  SELECT u.id, u.username, u.email, u.password, u.full_name, u.phone, u.country, u.city, u.email_verified, u.token, u.photo, u.ref_link, u.invitation_link, u.roles, u.parent_id, u.status, u.level AS user_level, u.created_at, u.updated_at, 0 AS level\n" +

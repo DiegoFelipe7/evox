@@ -33,7 +33,12 @@ public class CustomAttributes extends DefaultErrorAttributes {
             errorAttributes.put("message", message);
             errorAttributes.put("typeStatus" , "Warning");
         }
-
+        if (throwable instanceof IllegalArgumentException) {
+            String message = "Ocurrio un error en un argumento invalido comunica el administrador!";
+            errorAttributes.put("status", HttpStatus.BAD_REQUEST);
+            errorAttributes.put("message", message);
+            errorAttributes.put("typeStatus" , "Warning");
+        }
 
         return errorAttributes;
     }

@@ -24,7 +24,7 @@ public class SyntheticService {
     private final JwtProvider jwtProvider;
 
     public Mono<Synthetics> accountActivation(String transaction) {
-        return syntheticsRepository.findByTransaction(transaction)
+        return syntheticsRepository.findByTransactionEqualsIgnoreCase(transaction)
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Esta codigo de transaccion no existe!", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
                     if (Boolean.TRUE.equals(ele.getState())) {
@@ -44,7 +44,7 @@ public class SyntheticService {
     public Mono<Response> registrationTransaction(Synthetics synthetics, String token) {
         String username = jwtProvider.extractToken(token);
         return userRepository.findByUsername(username)
-                .flatMap(user -> syntheticsRepository.findByTransaction(synthetics.getTransaction())
+                .flatMap(user -> syntheticsRepository.findByTransactionEqualsIgnoreCase(synthetics.getTransaction())
                         .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
                                 "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
                         .switchIfEmpty(Mono.defer(() -> {
@@ -110,7 +110,7 @@ public class SyntheticService {
     }
 
     public Mono<Response> invalidTransaction(String transaction) {
-        return syntheticsRepository.findByTransaction(transaction)
+        return syntheticsRepository.findByTransactionEqualsIgnoreCase(transaction)
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Esta codigo de transaccion no existe!", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
                     ele.setId(ele.getId());

@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SyntheticsRepository extends ReactiveCrudRepository<Synthetics , Integer> {
-    Mono<Synthetics> findByTransaction(String transaction);
+    Mono<Synthetics> findByTransactionEqualsIgnoreCase(String transaction);
 
 
 }
