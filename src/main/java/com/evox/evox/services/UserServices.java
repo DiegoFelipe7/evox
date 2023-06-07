@@ -1,11 +1,14 @@
 package com.evox.evox.services;
 
 
+import com.evox.evox.dto.AccountSyntheticsDto;
 import com.evox.evox.dto.ReferralsDto;
 import com.evox.evox.dto.TokenDto;
 import com.evox.evox.dto.UserDto;
 import com.evox.evox.exception.CustomException;
+import com.evox.evox.model.AccountSynthetics;
 import com.evox.evox.model.User;
+import com.evox.evox.repository.AccountSyntheticsRepository;
 import com.evox.evox.repository.UserRepository;
 import com.evox.evox.security.jwt.JwtProvider;
 import com.evox.evox.utils.enums.TypeStateResponse;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.security.PublicKey;
 import java.util.Objects;
 
 
@@ -23,6 +27,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserServices {
     private final UserRepository repository;
+    private final AccountSyntheticsRepository accountSyntheticsRepository;
     private final ModelMapper modelMapper;
 
     private final JwtProvider jwtProvider;
@@ -43,15 +48,15 @@ public class UserServices {
                 .map(data -> new ReferralsDto(data.getFullName(), data.getLevel(), data.getUsername(), data.getCreatedAt()));
     }
 
-    public Flux<UserDto> getAllUses(){
-       return repository.findAll()
-               .map(ele->modelMapper.map(ele, UserDto.class));
+    public Flux<UserDto> getAllUses() {
+        return repository.findAll()
+                .map(ele -> modelMapper.map(ele, UserDto.class));
     }
 
 
     //:TODO ACTUALIZAR NIVEL DE USUARIOS BD
     public Flux<User> updateLevel() {
-        return repository.findUserAndDescendantsLevel("EvoxGroup").flatMap(ele->{
+        return repository.findUserAndDescendantsLevel("EvoxGroup").flatMap(ele -> {
             ele.setLevel(ele.getLevel());
             return repository.save(ele);
         });
@@ -69,5 +74,26 @@ public class UserServices {
                     return repository.save(ele).map(data -> new TokenDto(jwtProvider.generateToken(data)));
                 });
     }
+
+    public Mono<Boolean> accountSynthetic(String token) {
+        String userName = jwtProvider.extractToken(token);
+        return repository.findByUsername(userName)
+                .map(ele -> ele.getAccountSynthetics() != null)
+                .defaultIfEmpty(false);
+    }
+
+    public Mono<AccountSyntheticsDto> account(String token) {
+        String username = jwtProvider.extractToken(token);
+        return repository.findByUsername(username)
+                .flatMap(ele -> {
+                    if (ele.getAccountSynthetics() != null) {
+                        return accountSyntheticsRepository.findById(ele.getAccountSynthetics())
+                                .map(data -> modelMapper.map(data, AccountSyntheticsDto.class));
+                    } else {
+                        return Mono.empty();
+                    }
+                });
+    }
+
 
 }

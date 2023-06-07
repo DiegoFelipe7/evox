@@ -21,6 +21,8 @@ public class RouterUser {
                 .GET(PATH +"referrals/team", handler::referralsTeam)
                 .PUT(PATH+"edit",handler::updateUser)
                 .GET(PATH+"level",handler::updateLevel)
+                .GET(PATH+"syntheticsAccount" , handler::getAccountSynthetic)
+                .GET(PATH+"account", handler::account)
                 .build();
     }
 }

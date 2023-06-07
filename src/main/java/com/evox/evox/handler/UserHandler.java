@@ -1,5 +1,6 @@
 package com.evox.evox.handler;
 
+import com.evox.evox.dto.AccountSyntheticsDto;
 import com.evox.evox.dto.ReferralsDto;
 import com.evox.evox.dto.TokenDto;
 import com.evox.evox.dto.UserDto;
@@ -57,5 +58,19 @@ public class UserHandler {
                 .body(userServices.updateLevel(), User.class);
     }
 
+    public Mono<ServerResponse> getAccountSynthetic(ServerRequest serverRequest){
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return  ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userServices.accountSynthetic(token), Boolean.class);
+
+    }
+    public Mono<ServerResponse> account(ServerRequest serverRequest){
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return  ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userServices.account(token), AccountSyntheticsDto.class);
+
+    }
 
 }
