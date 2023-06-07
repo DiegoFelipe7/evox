@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class ListBridgeFundUsersDto {
-
+    private Integer id;
     private String transaction;
     private String title;
     private BigDecimal price;

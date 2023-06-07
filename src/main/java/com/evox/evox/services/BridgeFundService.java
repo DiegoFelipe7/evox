@@ -102,6 +102,7 @@ public class BridgeFundService {
                                 User user = tuple.getT1();
                                 BridgeAccountType bridgeAccountType = tuple.getT2();
                                 ListBridgeFundUsersDto dto = new ListBridgeFundUsersDto();
+                                dto.setId(bridgeFunds.getId());
                                 dto.setTransaction(bridgeFunds.getTransaction());
                                 dto.setTitle(bridgeAccountType.getTitle());
                                 dto.setPrice(bridgeAccountType.getPrice());
