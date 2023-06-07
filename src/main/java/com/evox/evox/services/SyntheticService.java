@@ -1,9 +1,11 @@
 package com.evox.evox.services;
 
 import com.evox.evox.dto.ListSyntheticUsersDto;
+import com.evox.evox.dto.SyntheticAccessDto;
 import com.evox.evox.exception.CustomException;
 import com.evox.evox.model.Synthetics;
 import com.evox.evox.model.enums.AccountState;
+import com.evox.evox.repository.AccountSyntheticsRepository;
 import com.evox.evox.repository.SyntheticsRepository;
 import com.evox.evox.repository.UserRepository;
 import com.evox.evox.security.jwt.JwtProvider;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SyntheticService {
     private final SyntheticsRepository syntheticsRepository;
+    private final AccountSyntheticsRepository accountSyntheticsRepository;
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
@@ -105,6 +108,17 @@ public class SyntheticService {
                 .flatMap(user -> syntheticsRepository.findAll()
                         .filter(ele -> ele.getUserId().equals(user.getId()) && ele.getSyntheticState().equals(AccountState.Error))
                         .next());
+    }
+
+
+    public Flux<SyntheticAccessDto> syntheticAccess(){
+        return userRepository.findAll().
+                filter(ele->ele.getAccountSynthetics()!=null)
+                .flatMap(ele->
+                        accountSyntheticsRepository.findById(ele.getAccountSynthetics())
+                                .map(data->new SyntheticAccessDto(ele.getUsername(),ele.getEmail(),data.getLogin(),data.getPassword(),data.getCreatedAt(),data.getState())));
+
+
     }
 
 

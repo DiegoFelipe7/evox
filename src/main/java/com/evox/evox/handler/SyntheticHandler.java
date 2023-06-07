@@ -1,6 +1,7 @@
 package com.evox.evox.handler;
 
 import com.evox.evox.dto.ListSyntheticUsersDto;
+import com.evox.evox.dto.SyntheticAccessDto;
 import com.evox.evox.model.AccountSynthetics;
 import com.evox.evox.model.Synthetics;
 import com.evox.evox.model.enums.AccountState;
@@ -29,6 +30,14 @@ public class SyntheticHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(syntheticService.getAllSynthetics(), ListSyntheticUsersDto.class);
     }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public Mono<ServerResponse> getAllSyntheticAccess(ServerRequest serverRequest){
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(syntheticService.syntheticAccess(), SyntheticAccessDto.class);
+    }
+
 
 
     public Mono<ServerResponse> activateAccount(ServerRequest serverRequest) {

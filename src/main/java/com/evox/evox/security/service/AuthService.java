@@ -72,7 +72,6 @@ public class AuthService {
         return referral(user);
     }
 
-    //TODO:CAMBIE EL NIVEL TOMA EL DEL PADRE Y LE SUMA UNO
     public Mono<Response> referral(User user) {
         return authRepository.findByEmailIgnoreCase(user.getEmail())
                 .flatMap(ele -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Este correo ya se encuentra registrado", TypeStateResponse.Error))
@@ -151,15 +150,6 @@ public class AuthService {
                 });
 
     }
-    //:TODO ENVIO MASIVO
 
-    public Flux<Response> resendEmail() {
-        return authRepository.findAll()
-                .filter(ele -> ele.getToken() != null && ele.getEmailVerified() == null)
-                .skip(187)
-                .delayElements(Duration.ofSeconds(60))
-                .flatMap(ele -> emailService.sendEmailWelcome(ele.getFullName(), ele.getEmail(), ele.getToken())
-                        .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
-    }
 
 }

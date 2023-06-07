@@ -1,8 +1,4 @@
 spring:
-#    r2dbc:
-#      url: "r2dbc:postgresql://localhost:5432/eboxdb"
-#      username: "postgres"
-#      password: "postgres"
   r2dbc:
     url: r2dbc:postgresql://${URL_DATABASE}
     username: ${USERNAME}

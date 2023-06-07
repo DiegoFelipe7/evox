@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class RouterUser {
 
     private static final String PATH = "api/users/";
-    //:TODO ELIMINAR HANDLER
     @Bean
     RouterFunction<ServerResponse> userRouter(UserHandler handler) {
         return RouterFunctions.route()
@@ -20,7 +19,6 @@ public class RouterUser {
                 .GET(PATH +"referrals", handler::referrals)
                 .GET(PATH +"referrals/team", handler::referralsTeam)
                 .PUT(PATH+"edit",handler::updateUser)
-                .GET(PATH+"level",handler::updateLevel)
                 .GET(PATH+"syntheticsAccount" , handler::getAccountSynthetic)
                 .GET(PATH+"account", handler::account)
                 .build();

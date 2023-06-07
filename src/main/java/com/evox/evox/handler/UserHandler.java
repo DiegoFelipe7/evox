@@ -51,12 +51,7 @@ public class UserHandler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(userServices.editUser(ele), TokenDto.class));
     }
-    //:TODO METODO PARA ENVIAR
-    public Mono<ServerResponse> updateLevel(ServerRequest serverRequest) {
-       return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(userServices.updateLevel(), User.class);
-    }
+
 
     public Mono<ServerResponse> getAccountSynthetic(ServerRequest serverRequest){
         String token = serverRequest.headers().firstHeader("Authorization");

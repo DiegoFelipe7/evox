@@ -1,11 +1,9 @@
-package com.evox.evox.model;
+package com.evox.evox.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
@@ -13,10 +11,9 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "account_synthetics")
-public class AccountSynthetics {
-    @Id
-    private Integer id;
+public class SyntheticAccessDto {
+    private String username;
+    private String email;
     private String login;
     private String password;
     private LocalDateTime createdAt;

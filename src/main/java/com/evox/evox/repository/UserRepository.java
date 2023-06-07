@@ -41,33 +41,4 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
     Flux<User> findUserAndParents(@Param("username") String username , @Param("level") Integer level);
 
 
-    //:TODO METODO PARA CAMBIO DE NIVELES ELIMINAR
-   /* @Query(value = "WITH RECURSIVE user_team AS (\n" +
-            "  SELECT u.id, u.username, u.email, u.password, u.full_name, u.phone, u.country, u.city, u.email_verified, u.token, u.photo, u.ref_link, u.invitation_link, u.roles, u.parent_id, u.status, u.level AS user_level, u.created_at, u.updated_at, 0 AS level\n" +
-            "  FROM users u\n" +
-            "   WHERE u.username = :username\n" +
-            "  UNION ALL\n" +
-            "  SELECT u.id, u.username, u.email, u.password, u.full_name, u.phone, u.country, u.city, u.email_verified, u.token, u.photo, u.ref_link, u.invitation_link, u.roles, u.parent_id, u.status, u.level AS user_level, u.created_at, u.updated_at, \n" +
-            "    CASE \n" +
-            "      WHEN ut.level + 1 > 10 THEN 10 \n" +
-            "      ELSE ut.level + 1 \n" +
-            "    END AS level\n" +
-            "  FROM users u\n" +
-            "  INNER JOIN user_team ut ON u.parent_id = ut.id\n" +
-            ")\n" +
-            "SELECT id, username, email, password, full_name, phone, country, city, email_verified, token, photo, ref_link, invitation_link, roles, parent_id, status, level AS level, created_at, updated_at\n" +
-            "FROM user_team;")*/
-
-    @Query(value = "WITH RECURSIVE user_team AS (\n" +
-            "  SELECT u.id, u.username, u.email, u.password, u.full_name, u.phone, u.country, u.city, u.email_verified, u.token, u.photo, u.ref_link, u.invitation_link, u.roles, u.parent_id, u.status, u.level AS user_level, u.created_at, u.updated_at, 0 AS level\n" +
-            "  FROM users u\n" +
-            "  WHERE u.username = :username\n" +
-            "  UNION ALL\n" +
-            "  SELECT u.id, u.username, u.email, u.password, u.full_name, u.phone, u.country, u.city, u.email_verified, u.token, u.photo, u.ref_link, u.invitation_link, u.roles, u.parent_id, u.status, u.level AS user_level, u.created_at, u.updated_at, ut.level + 1 AS level\n" +
-            "  FROM users u\n" +
-            "  INNER JOIN user_team ut ON u.parent_id = ut.id\n" +
-            ")\n" +
-            "SELECT id, username, email, password, full_name, phone, country, city, email_verified, token, photo, ref_link, invitation_link, roles, parent_id, status, level AS level, created_at, updated_at\n" +
-            "FROM user_team;\n")
-    Flux<User> findUserAndDescendantsLevel(@Param("username") String username);
 }

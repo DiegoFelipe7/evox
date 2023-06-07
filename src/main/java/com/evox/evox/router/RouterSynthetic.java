@@ -24,6 +24,7 @@ public class RouterSynthetic {
                 .PATCH(PATH+"invalid/{transaction}" , handler::invalidTransaction)
                 .POST(PATH+"transaction" , handler::registrationTransaction)
                 .POST(PATH+"registerAccount" , handler::registerAccount)
+                .GET(PATH+"access" , handler::getAllSyntheticAccess)
                 .build();
     }
 }

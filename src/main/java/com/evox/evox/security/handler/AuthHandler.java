@@ -80,9 +80,5 @@ public class AuthHandler {
                 .body(authService.activateAccount(token), Response.class);
     }
 
-    public Mono<ServerResponse> send (ServerRequest serverRequest){
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.resendEmail(), Response.class);
-    }
+
 }
