@@ -41,46 +41,23 @@ public class SyntheticService {
                 });
     }
 
-//    public Mono<Response> registrationTransaction(Synthetics synthetics, String token) {
-//        String username = jwtProvider.extractToken(token);
-//        return userRepository.findByUsername(username)
-//                .flatMap(user -> syntheticsRepository.findByTransactionEqualsIgnoreCase(synthetics.getTransaction())
-//                        .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
-//                                "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
-//                        .switchIfEmpty(Mono.defer(() -> {
-//                            synthetics.setType("Synthetic");
-//                            synthetics.setSyntheticState(AccountState.Pending);
-//                            synthetics.setUserId(user.getId());
-//                            return syntheticsRepository.save(synthetics);
-//                        })) .thenReturn(new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!")));
-//
-//
-//    }
-
     public Mono<Response> registrationTransaction(Synthetics synthetics, String token) {
         String username = jwtProvider.extractToken(token);
         return userRepository.findByUsername(username)
                 .flatMap(user -> syntheticsRepository.findByTransactionEqualsIgnoreCase(synthetics.getTransaction())
-                            .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
-                                    "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
-                            .switchIfEmpty(syntheticsRepository.findAll()
-                                    .filter(ele -> ele.getUserId().equals(user.getId()))
-                                    .next()
-                                    .flatMap(ele -> {
-                                        if (ele.getSyntheticState().equals(AccountState.Verified)) {
-                                            return Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
-                                                    "Aún tienes tu mensualidad activa", TypeStateResponse.Warning));
-                                        }
-                                        return Mono.just(ele);
-                                    }))
-                            .flatMap(existingSynthetics -> {
-                                synthetics.setType("Synthetic");
-                                synthetics.setSyntheticState(AccountState.Pending);
-                                synthetics.setUserId(user.getId());
-                                return syntheticsRepository.save(synthetics);
-                            })
-                            .thenReturn(new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!")));
+                        .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
+                                "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
+                        .switchIfEmpty(Mono.defer(() -> {
+                            synthetics.setType("Synthetic");
+                            synthetics.setSyntheticState(AccountState.Pending);
+                            synthetics.setUserId(user.getId());
+                            return syntheticsRepository.save(synthetics);
+                        })) .thenReturn(new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!")));
+
+
     }
+
+
 
     public Flux<ListSyntheticUsersDto> getAllSynthetics() {
         return syntheticsRepository.findAll()
