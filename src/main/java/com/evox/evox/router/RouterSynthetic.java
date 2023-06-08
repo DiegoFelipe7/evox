@@ -25,7 +25,7 @@ public class RouterSynthetic {
                 .POST(PATH+"transaction" , handler::registrationTransaction)
                 .POST(PATH+"registerAccount" , handler::registerAccount)
                 .GET(PATH+"access" , handler::getAllSyntheticAccess)
-                .PUT(PATH+"stateAccount/{id}" , handler::stateAccount)
+                .PATCH(PATH+"stateAccount/{id}" , handler::stateAccount)
                 .build();
     }
 }
