@@ -116,7 +116,7 @@ public class SyntheticService {
                 filter(ele->ele.getAccountSynthetics()!=null)
                 .flatMap(ele->
                         accountSyntheticsRepository.findById(ele.getAccountSynthetics())
-                                .map(data->new SyntheticAccessDto(ele.getUsername(),ele.getEmail(),data.getLogin(),data.getPassword(),data.getCreatedAt(),data.getState())));
+                                .map(data->new SyntheticAccessDto(data.getId(),ele.getUsername(),ele.getEmail(),data.getLogin(),data.getPassword(),data.getCreatedAt(),data.getState())));
 
 
     }

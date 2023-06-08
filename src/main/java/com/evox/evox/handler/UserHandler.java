@@ -1,11 +1,9 @@
 package com.evox.evox.handler;
 
-import com.evox.evox.dto.AccountSyntheticsDto;
-import com.evox.evox.dto.ReferralsDto;
-import com.evox.evox.dto.TokenDto;
-import com.evox.evox.dto.UserDto;
+import com.evox.evox.dto.*;
 import com.evox.evox.model.User;
 import com.evox.evox.services.UserServices;
+import com.evox.evox.utils.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -29,6 +27,7 @@ public class UserHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userServices.getAllReferrals(token), ReferralsDto.class);
     }
+
     public Mono<ServerResponse> referralsTeam(ServerRequest serverRequest) {
         String token = serverRequest.headers().firstHeader("Authorization");
         return ServerResponse.ok()
@@ -36,8 +35,8 @@ public class UserHandler {
                 .body(userServices.getAllReferralsTeam(token), ReferralsDto.class);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest){
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userServices.getAllUses(), UserDto.class);
@@ -53,18 +52,26 @@ public class UserHandler {
     }
 
 
-    public Mono<ServerResponse> getAccountSynthetic(ServerRequest serverRequest){
+    public Mono<ServerResponse> getAccountSynthetic(ServerRequest serverRequest) {
         String token = serverRequest.headers().firstHeader("Authorization");
-        return  ServerResponse.ok()
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userServices.accountSynthetic(token), Boolean.class);
 
     }
-    public Mono<ServerResponse> account(ServerRequest serverRequest){
+
+    public Mono<ServerResponse> account(ServerRequest serverRequest) {
         String token = serverRequest.headers().firstHeader("Authorization");
-        return  ServerResponse.ok()
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userServices.account(token), AccountSyntheticsDto.class);
+
+    }
+
+    public Mono<ServerResponse> seedEmail(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(LoginDto.class).flatMap(ele -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userServices.resendEmail(ele), Response.class));
 
     }
 

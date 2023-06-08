@@ -3,12 +3,10 @@ package com.evox.evox.services;
 import com.evox.evox.dto.ListBridgeFundUsersDto;
 import com.evox.evox.dto.ListSyntheticUsersDto;
 import com.evox.evox.exception.CustomException;
-import com.evox.evox.model.BridgeAccountType;
-import com.evox.evox.model.BridgeFunds;
-import com.evox.evox.model.Synthetics;
-import com.evox.evox.model.User;
+import com.evox.evox.model.*;
 import com.evox.evox.model.enums.AccountState;
 import com.evox.evox.repository.BridgeAccountTypeRepository;
+import com.evox.evox.repository.BridgeFundsAccountRepository;
 import com.evox.evox.repository.BridgeFundsRepository;
 import com.evox.evox.repository.UserRepository;
 import com.evox.evox.security.jwt.JwtProvider;
@@ -22,11 +20,13 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BridgeFundService {
     private final BridgeAccountTypeRepository bridgeAccountTypeRepository;
+    private final BridgeFundsAccountRepository bridgeFundsAccountRepository;
     private final UserRepository userRepository;
     private final BridgeFundsRepository bridgeFundsRepository;
     private final JwtProvider jwtProvider;
@@ -60,7 +60,7 @@ public class BridgeFundService {
 
     public Mono<Response> registrationTransaction(BridgeFunds bridgeFunds, String token) {
         String username = jwtProvider.extractToken(token);
-       return userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .flatMap(user -> bridgeFundsRepository.findByTransactionEqualsIgnoreCase(bridgeFunds.getTransaction())
                         .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
                                 "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
@@ -116,4 +116,19 @@ public class BridgeFundService {
                             });
                 });
     }
+
+    public Mono<Response> saveAccountBridgeFunds(List<BridgeFundsAccount> bridgeFundsAccounts, Integer id) {
+        return bridgeFundsRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "La cuenta no existe", TypeStateResponse.Error)))
+                .flatMap(ele -> {
+                    if (ele.getQuantity().equals(bridgeFundsAccounts.size())) {
+                        return bridgeFundsAccountRepository.saveAll(bridgeFundsAccounts)
+                                .collectList()
+                                .map(savedAccounts -> new Response(TypeStateResponse.Success, "Cuentas registradas"));
+                    }
+                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "", TypeStateResponse.Error));
+                });
+
+    }
+
 }

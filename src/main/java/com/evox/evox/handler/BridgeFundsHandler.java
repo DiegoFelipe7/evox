@@ -2,22 +2,22 @@ package com.evox.evox.handler;
 
 import com.evox.evox.dto.ListBridgeFundUsersDto;
 import com.evox.evox.dto.ListSyntheticUsersDto;
-import com.evox.evox.model.AccountSynthetics;
-import com.evox.evox.model.BridgeAccountType;
-import com.evox.evox.model.BridgeFunds;
-import com.evox.evox.model.Synthetics;
+import com.evox.evox.model.*;
 import com.evox.evox.model.enums.AccountState;
 import com.evox.evox.services.BridgeFundService;
 import com.evox.evox.utils.Response;
 import com.evox.evox.validation.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -69,6 +69,15 @@ public class BridgeFundsHandler {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(bridgeFundService.invalidTransaction(transaction) , Response.class);
+    }
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public Mono<ServerResponse> saveAccounts(ServerRequest serverRequest){
+        Integer id = Integer.valueOf(serverRequest.pathVariable("id"));
+        return serverRequest.bodyToMono(new ParameterizedTypeReference<List<BridgeFundsAccount>>() {})
+                .flatMap(ele->
+                        ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(bridgeFundService.saveAccountBridgeFunds(ele , id) , Response.class));
     }
 
 }

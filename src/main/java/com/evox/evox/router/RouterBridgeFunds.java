@@ -22,6 +22,7 @@ public class RouterBridgeFunds {
                 .POST(PATH+"transaction" , handler::registrationTransaction)
                 .PATCH(PATH+"active/{transaction}" , handler::activateAccount)
                 .PATCH(PATH+"invalid/{transaction}" , handler::invalidTransaction)
+                .POST(PATH+"linkAccounts/{id}" , handler::saveAccounts)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.evox.evox.services;
 
+import com.evox.evox.exception.CustomException;
 import com.evox.evox.model.AccountSynthetics;
 import com.evox.evox.repository.AccountSyntheticsRepository;
 import com.evox.evox.repository.UserRepository;
@@ -7,6 +8,7 @@ import com.evox.evox.security.jwt.JwtProvider;
 import com.evox.evox.utils.Response;
 import com.evox.evox.utils.enums.TypeStateResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -28,5 +30,17 @@ public class AccountSyntheticsService {
                                     return userRepository.save(user);
                                 })
                                 .thenReturn(new Response(TypeStateResponse.Success, "Cuenta vinculada exitosamente!")));
+    }
+    public Mono<Response> stateAccount(Integer id){
+        return accountSyntheticsRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST , "Ocurrio un erro, intentalo nuevamente" , TypeStateResponse.Warning)))
+                .flatMap(ele->{
+                    ele.setId(ele.getId());
+                    ele.setState(!ele.getState());
+                    return accountSyntheticsRepository.save(ele)
+                            .thenReturn(new Response(TypeStateResponse.Success , "Cambio exitoso!"));
+                });
+
+
     }
 }

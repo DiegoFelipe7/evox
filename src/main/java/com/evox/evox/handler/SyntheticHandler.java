@@ -24,20 +24,17 @@ public class SyntheticHandler {
     private final SyntheticService syntheticService;
     private final AccountSyntheticsService accountSyntheticsService;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public Mono<ServerResponse> getAllSyntheticsUsers(ServerRequest serverRequest) {
+   public Mono<ServerResponse> getAllSyntheticsUsers(ServerRequest serverRequest) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(syntheticService.getAllSynthetics(), ListSyntheticUsersDto.class);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public Mono<ServerResponse> getAllSyntheticAccess(ServerRequest serverRequest){
+   public Mono<ServerResponse> getAllSyntheticAccess(ServerRequest serverRequest){
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(syntheticService.syntheticAccess(), SyntheticAccessDto.class);
     }
-
 
 
     public Mono<ServerResponse> activateAccount(ServerRequest serverRequest) {
@@ -71,7 +68,7 @@ public class SyntheticHandler {
                         .body(accountSyntheticsService.registerSyntheticAccount(token, ele), Response.class));
     }
 
-    public Mono<ServerResponse> invalidTransaction(ServerRequest serverRequest){
+   public Mono<ServerResponse> invalidTransaction(ServerRequest serverRequest){
         String transaction = serverRequest.pathVariable("transaction");
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,6 +80,13 @@ public class SyntheticHandler {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(syntheticService.getIdSyntheticUser(token), Synthetics.class);
+    }
+
+   public Mono<ServerResponse> stateAccount(ServerRequest serverRequest){
+        Integer id = Integer.valueOf(serverRequest.pathVariable("id"));
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(accountSyntheticsService.stateAccount(id), Response.class);
     }
 
 }

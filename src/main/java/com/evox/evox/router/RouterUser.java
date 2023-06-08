@@ -21,6 +21,7 @@ public class RouterUser {
                 .PUT(PATH+"edit",handler::updateUser)
                 .GET(PATH+"syntheticsAccount" , handler::getAccountSynthetic)
                 .GET(PATH+"account", handler::account)
+                .POST(PATH+"seedEmail" , handler::seedEmail)
                 .build();
     }
 }

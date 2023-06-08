@@ -8,6 +8,8 @@ import com.evox.evox.model.User;
 import com.evox.evox.repository.AccountSyntheticsRepository;
 import com.evox.evox.repository.UserRepository;
 import com.evox.evox.security.jwt.JwtProvider;
+import com.evox.evox.security.service.EmailService;
+import com.evox.evox.utils.Response;
 import com.evox.evox.utils.enums.TypeStateResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.security.PublicKey;
 import java.util.Objects;
 
 
@@ -28,6 +29,8 @@ public class UserServices {
     private final ModelMapper modelMapper;
 
     private final JwtProvider jwtProvider;
+
+    private final EmailService emailService;
 
     public Flux<ReferralsDto> getAllReferrals(String token) {
         String userName = jwtProvider.extractToken(token);
@@ -84,7 +87,12 @@ public class UserServices {
                 });
     }
 
-    
+    public Mono<Response> resendEmail(LoginDto loginDto) {
+        return repository.findByEmail(loginDto.getEmail())
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El email no esta registrado en la bd", TypeStateResponse.Error)))
+                .flatMap(ele -> emailService.sendEmailWelcome(ele.getFullName(), ele.getEmail(), ele.getToken())
+                        .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
+    }
 
 
 }
