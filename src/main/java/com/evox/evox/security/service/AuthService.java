@@ -73,26 +73,14 @@ public class AuthService {
     }
 
     public Mono<Response> referral(User user) {
-        return authRepository.findByEmailIgnoreCase(user.getEmail())
-                .flatMap(ele -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Este correo ya se encuentra registrado", TypeStateResponse.Error))
-                        .flatMap(data->
-                            authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
-                                    .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
-                                    .flatMap(parent -> {
-                                        user.setParentId(parent.getId());
-                                        return authRepository.save(user).flatMap(res ->
-                                                emailService.sendEmailWelcome(res.getFullName(), res.getEmail(), res.getToken())
-                                                        .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
-                                    })));
-//                        var data = authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
-//                                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
-//                                .flatMap(parent -> {
-//                                    user.setParentId(parent.getId());
-//                                    //user.setLevel(parent.getLevel()+1);
-//                                    return authRepository.save(user).flatMap(ele ->
-//                                            emailService.sendEmailWelcome(ele.getFullName(), ele.getEmail(), ele.getToken())
-//                                                    .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
-//                                });
+        return authRepository.findByUsername(Utils.extractUsername(user.getInvitationLink()))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El link de referido no existe!", TypeStateResponse.Warning)))
+                .flatMap(parent -> {
+                    user.setParentId(parent.getId());
+                    return authRepository.save(user).flatMap(ele ->
+                            emailService.sendEmailWelcome(ele.getFullName(), ele.getEmail(), ele.getToken())
+                                    .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
+                });
 
     }
 
