@@ -59,7 +59,7 @@ public class BridgeFundsHandler {
 
     public Mono<ServerResponse> accountStatusBridgeFunds(ServerRequest serverRequest) {
         String token = serverRequest.headers().firstHeader("Authorization");
-        return org.springframework.web.reactive.function.server.ServerResponse.ok()
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(bridgeFundService.getStateUser(token), AccountState.class);
 
@@ -78,6 +78,20 @@ public class BridgeFundsHandler {
                         ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(bridgeFundService.saveAccountBridgeFunds(ele , id) , Response.class));
+    }
+
+    public Mono<ServerResponse> validateRegistration(ServerRequest serverRequest){
+        Integer id = Integer.valueOf(serverRequest.pathVariable("id"));
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(bridgeFundService.getValidateRegistration(id) , Boolean.class);
+    }
+
+    public Mono<ServerResponse> getAccounts(ServerRequest serverRequest){
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(bridgeFundService.getAccountsBridgeFunds(token) , BridgeFundsAccount.class);
     }
 
 }
