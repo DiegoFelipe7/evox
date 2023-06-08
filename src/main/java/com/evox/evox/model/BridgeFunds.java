@@ -24,6 +24,7 @@ public class BridgeFunds {
     private Integer id;
     @NotBlank(message = "La transaccion es requerida")
     private String transaction;
+    private String title;
     @Min(value = 1, message = "La cantidad debe ser diferente de cero")
     private Integer quantity;
     private BigDecimal total;

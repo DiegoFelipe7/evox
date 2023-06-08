@@ -1,5 +1,6 @@
 package com.evox.evox.services;
 
+import com.evox.evox.dto.ListAccountBridgeFundsDto;
 import com.evox.evox.dto.ListBridgeFundUsersDto;
 import com.evox.evox.dto.ListSyntheticUsersDto;
 import com.evox.evox.exception.CustomException;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +69,7 @@ public class BridgeFundService {
                         .switchIfEmpty(bridgeAccountTypeRepository.findById(bridgeFunds.getBridgeAccountId())
                                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No se seleccionó un tipo de cuenta", TypeStateResponse.Warning)))
                                 .map(ele -> {
+                                    bridgeFunds.setTitle(ele.getTitle());
                                     bridgeFunds.setTotal(new BigDecimal(bridgeFunds.getQuantity()).multiply(ele.getPrice()));
                                     bridgeFunds.setBridgeFundsState(AccountState.Pending);
                                     bridgeFunds.setUserId(user.getId());
@@ -119,16 +122,39 @@ public class BridgeFundService {
 
     public Mono<Response> saveAccountBridgeFunds(List<BridgeFundsAccount> bridgeFundsAccounts, Integer id) {
         return bridgeFundsRepository.findById(id)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "La cuenta no existe", TypeStateResponse.Error)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El id de la transaccio es invalido, intentalo nuevamente", TypeStateResponse.Error)))
                 .flatMap(ele -> {
                     if (ele.getQuantity().equals(bridgeFundsAccounts.size())) {
                         return bridgeFundsAccountRepository.saveAll(bridgeFundsAccounts)
                                 .collectList()
                                 .map(savedAccounts -> new Response(TypeStateResponse.Success, "Cuentas registradas"));
                     }
-                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "", TypeStateResponse.Error));
+                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "La cantidad de cuentas enviadas es invalida", TypeStateResponse.Error));
                 });
 
     }
+
+    public Mono<Boolean> getValidateRegistration(Integer id) {
+        return bridgeFundsRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El id de la transaccio es invalido, intentalo nuevamente", TypeStateResponse.Error)))
+                .flatMap(ele -> bridgeFundsAccountRepository.findAll()
+                        .filter(data -> data.getBridgeFundsId().equals(ele.getId()))
+                        .count()
+                        .map(size -> !Objects.equals(ele.getQuantity(), Math.toIntExact(size))));
+
+    }
+
+    public Flux<ListAccountBridgeFundsDto> getAccountsBridgeFunds(String token) {
+        String username = jwtProvider.extractToken(token);
+        return userRepository.findByUsername(username)
+                .flatMap(ele -> bridgeFundsRepository.findAll()
+                        .filter(data -> data.getUserId().equals(ele.getId()))
+                        .flatMap(res -> bridgeFundsAccountRepository.findAll()
+                                .filter( account-> account.getBridgeFundsId().equals(res.getId())))
+                        .collectList()
+                        .map(accounts -> new ListAccountBridgeFundsDto(1, "", accounts, false)))
+                .flux();
+    }
+
 
 }
