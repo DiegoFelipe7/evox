@@ -147,14 +147,16 @@ public class BridgeFundService {
     public Flux<ListAccountBridgeFundsDto> getAccountsBridgeFunds(String token) {
         String username = jwtProvider.extractToken(token);
         return userRepository.findByUsername(username)
-                .flatMap(ele -> bridgeFundsRepository.findAll()
+                .flatMapMany(ele -> bridgeFundsRepository.findAll()
                         .filter(data -> data.getUserId().equals(ele.getId()))
                         .flatMap(res -> bridgeFundsAccountRepository.findAll()
-                                .filter( account-> account.getBridgeFundsId().equals(res.getId())))
-                        .collectList()
-                        .map(accounts -> new ListAccountBridgeFundsDto(1, "", accounts, false)))
-                .flux();
+                                .filter(account -> account.getBridgeFundsId().equals(res.getId()))
+                                .collectList()
+                                .map(accounts -> new ListAccountBridgeFundsDto(res.getId(), res.getTitle(), accounts, res.getState()))
+                                .flux()
+                        )
+                );
     }
 
-
 }
+
