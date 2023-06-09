@@ -74,6 +74,7 @@ public class BridgeFundsHandler {
     public Mono<ServerResponse> saveAccounts(ServerRequest serverRequest){
         Integer id = Integer.valueOf(serverRequest.pathVariable("id"));
         return serverRequest.bodyToMono(new ParameterizedTypeReference<List<BridgeFundsAccount>>() {})
+                .doOnNext(objectValidator::validateList)
                 .flatMap(ele->
                         ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
