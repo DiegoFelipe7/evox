@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 public class BridgeFunds {
     @Id
     private Integer id;
+    private String type;
     @NotBlank(message = "La transaccion es requerida")
     private String transaction;
     private String title;
