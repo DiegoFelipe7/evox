@@ -96,7 +96,6 @@ public class BridgeFundService {
 
     public Flux<ListBridgeFundUsersDto> getAllBridgeFunds() {
         return bridgeFundsRepository.findAll()
-                .filter(ele -> ele.getBridgeFundsState().equals(AccountState.Pending))
                 .flatMap(bridgeFunds -> {
                     Mono<User> userMono = userRepository.findById(bridgeFunds.getUserId());
                     Mono<BridgeAccountType> bridgeAccountTypeMono = bridgeAccountTypeRepository.findById(bridgeFunds.getBridgeAccountId());

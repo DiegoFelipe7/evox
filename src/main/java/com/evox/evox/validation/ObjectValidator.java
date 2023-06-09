@@ -27,7 +27,7 @@ public class ObjectValidator {
         if(errors.isEmpty())
             return object;
         else {
-            String message = errors.stream().map(err -> err.getMessage()).collect(Collectors.joining(", "));
+            String message = errors.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "));
             throw new CustomException(HttpStatus.BAD_REQUEST, message , TypeStateResponse.Warning);
         }
     }
