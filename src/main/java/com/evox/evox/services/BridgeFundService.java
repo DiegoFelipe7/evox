@@ -69,6 +69,7 @@ public class BridgeFundService {
                         .switchIfEmpty(bridgeAccountTypeRepository.findById(bridgeFunds.getBridgeAccountId())
                                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No se seleccionó un tipo de cuenta", TypeStateResponse.Warning)))
                                 .map(ele -> {
+                                    bridgeFunds.setType("Bridge Funds");
                                     bridgeFunds.setTitle(ele.getTitle());
                                     bridgeFunds.setTotal(new BigDecimal(bridgeFunds.getQuantity()).multiply(ele.getPrice()));
                                     bridgeFunds.setBridgeFundsState(AccountState.Pending);

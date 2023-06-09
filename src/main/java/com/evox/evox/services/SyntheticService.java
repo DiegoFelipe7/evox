@@ -51,7 +51,7 @@ public class SyntheticService {
                         .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
                                 "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
                         .switchIfEmpty(Mono.defer(() -> {
-                            synthetics.setType("Synthetic");
+                            synthetics.setType("Evox Synthetic");
                             synthetics.setSyntheticState(AccountState.Pending);
                             synthetics.setUserId(user.getId());
                             return syntheticsRepository.save(synthetics);
