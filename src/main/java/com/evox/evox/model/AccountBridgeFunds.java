@@ -1,4 +1,4 @@
-package com.evox.evox.model.enums;
+package com.evox.evox.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
