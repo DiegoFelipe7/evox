@@ -6,6 +6,7 @@ import com.evox.evox.dto.ListSyntheticUsersDto;
 import com.evox.evox.exception.CustomException;
 import com.evox.evox.model.*;
 import com.evox.evox.model.enums.AccountState;
+import com.evox.evox.model.enums.State;
 import com.evox.evox.repository.BridgeAccountTypeRepository;
 import com.evox.evox.repository.BridgeFundsAccountRepository;
 import com.evox.evox.repository.BridgeFundsRepository;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,8 +36,10 @@ public class BridgeFundService {
     private final JwtProvider jwtProvider;
 
     public Flux<BridgeAccountType> getBridgeAccountType() {
-        return bridgeAccountTypeRepository.findAll();
+        return bridgeAccountTypeRepository.findAll()
+                .sort(Comparator.comparing(BridgeAccountType::getPrice));
     }
+
 
 
     public Mono<BridgeFunds> accountActivation(String transaction) {
@@ -58,6 +62,14 @@ public class BridgeFundService {
                         .next()
                         .map(BridgeFunds::getBridgeFundsState)
                         .defaultIfEmpty(AccountState.Shopping));
+    }
+
+    public Mono<BridgeFunds> getTransaction(String token) {
+        String username = jwtProvider.extractToken(token);
+        return userRepository.findByUsername(username)
+                .flatMap(ele -> bridgeFundsRepository.findAll()
+                            .filter(data -> data.getUserId().equals(ele.getId()) && data.getBridgeFundsState().equals(AccountState.Error))
+                            .next());
     }
 
     public Mono<Response> registrationTransaction(BridgeFunds bridgeFunds, String token) {
@@ -157,6 +169,7 @@ public class BridgeFundService {
                         )
                 );
     }
+
 
 }
 

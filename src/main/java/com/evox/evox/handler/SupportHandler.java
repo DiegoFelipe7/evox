@@ -1,10 +1,7 @@
 package com.evox.evox.handler;
-
-import com.evox.evox.dto.ListSyntheticUsersDto;
 import com.evox.evox.dto.SupportDto;
 import com.evox.evox.dto.SyntheticAccessDto;
 import com.evox.evox.model.Support;
-import com.evox.evox.model.Synthetics;
 import com.evox.evox.services.SupportService;
 import com.evox.evox.utils.Response;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +24,13 @@ public class SupportHandler {
                 .body(supportService.getAllSupport(), SupportDto.class);
     }
 
+    public Mono<ServerResponse> getAllSupportId(ServerRequest serverRequest){
+        Integer id = Integer.valueOf(serverRequest.pathVariable("id"));
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(supportService.getAllSupportId(id), SyntheticAccessDto.class);
+    }
+
     public Mono<ServerResponse> getAllSupportUsers(ServerRequest serverRequest){
         String token = serverRequest.headers().firstHeader("Authorization");
         return ServerResponse.ok()
@@ -45,13 +49,13 @@ public class SupportHandler {
     }
 
 
-    public Mono<ServerResponse> registrationResponse(ServerRequest serverRequest) {
-        String token = serverRequest.headers().firstHeader("Authorization");
-        return serverRequest
+    public Mono<ServerResponse> editSupport(ServerRequest serverRequest) {
+        Integer id = Integer.valueOf(serverRequest.pathVariable("id"));
+       return serverRequest
                 .bodyToMono(Support.class)
                 .flatMap(ele -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(supportService.saveSupport(ele, token), Response.class));
+                        .body(supportService.editSupport(ele, id), Response.class));
     }
 
 }

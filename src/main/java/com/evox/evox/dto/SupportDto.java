@@ -34,4 +34,12 @@ public class SupportDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public SupportDto(Integer id, String category, State state, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.category = category;
+        this.state = state;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }

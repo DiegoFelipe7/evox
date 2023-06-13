@@ -26,16 +26,16 @@ public class SupportService {
     public Flux<SupportDto> getAllSupport() {
         return supportRepository.findAll()
                 .flatMap(ele -> userRepository.findById(ele.getId())
-                .map(data -> new SupportDto(ele.getId(),
-                        ele.getCategory(),
-                        ele.getQuestion(),
-                        ele.getAnswer(),
-                        data.getUsername(),
-                        data.getEmail(),
-                        ele.getUrlPhoto(),
-                        ele.getState(),
-                        ele.getCreatedAt(),
-                        ele.getUpdatedAt())));
+                        .map(data -> new SupportDto(ele.getId(),
+                                ele.getCategory(),
+                                ele.getQuestion(),
+                                ele.getAnswer(),
+                                data.getUsername(),
+                                data.getEmail(),
+                                ele.getUrlPhoto(),
+                                ele.getState(),
+                                ele.getCreatedAt(),
+                                ele.getUpdatedAt())));
 
     }
 
@@ -45,11 +45,8 @@ public class SupportService {
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Error filtrando el usuario! ", TypeStateResponse.Error)))
                 .flatMapMany(ele -> supportRepository.findAll()
                         .filter(data -> data.getUserId().equals(ele.getId()))
-                        .map(support -> new SupportDto(ele.getId(),
+                        .map(support -> new SupportDto(support.getId(),
                                 support.getCategory(),
-                                support.getQuestion(),
-                                support.getAnswer(),
-                                support.getUrlPhoto(),
                                 support.getState(),
                                 support.getCreatedAt(),
                                 support.getUpdatedAt())));
@@ -57,26 +54,28 @@ public class SupportService {
 
     public Mono<Support> getAllSupportId(Integer id) {
         return supportRepository.findById(id)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST , "No existe un ticket de soporte con esta informacion!" , TypeStateResponse.Warning)));
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No existe un ticket de soporte con esta informacion!", TypeStateResponse.Warning)));
     }
 
 
     public Mono<Response> saveSupport(Support support, String token) {
         String username = jwtProvider.extractToken(token);
-        return userRepository.findByUsername(username).flatMap(ele -> {
-            support.setTicket(Utils.uid());
-            support.setState(State.Pending);
-            return supportRepository.save(support)
-                    .thenReturn(new Response(TypeStateResponse.Success, "Solicitud enviada!"));
-        });
+        return userRepository.findByUsername(username)
+                .flatMap(ele -> {
+                    support.setTicket(Utils.uid());
+                    support.setUserId(ele.getId());
+                    support.setState(State.Pending);
+                    return supportRepository.save(support)
+                            .thenReturn(new Response(TypeStateResponse.Success, "Solicitud enviada!"));
+                });
 
     }
 
-    public Mono<Response> editSupport(Support support , Integer id) {
-       return supportRepository.findById(id)
-               .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST , "No existe un ticket de soporte con esta informacion!" , TypeStateResponse.Warning)))
-               .flatMap(ele->supportRepository.save(support)
-                           .thenReturn(new Response(TypeStateResponse.Success , "Mensaje enviado")));
+    public Mono<Response> editSupport(Support support, Integer id) {
+        return supportRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No existe un ticket de soporte con esta informacion!", TypeStateResponse.Warning)))
+                .flatMap(ele -> supportRepository.save(support)
+                        .thenReturn(new Response(TypeStateResponse.Success, "Mensaje enviado")));
     }
 
 

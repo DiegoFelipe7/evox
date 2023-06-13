@@ -95,4 +95,11 @@ public class BridgeFundsHandler {
                 .body(bridgeFundService.getAccountsBridgeFunds(token) , BridgeFundsAccount.class);
     }
 
+    public Mono<ServerResponse> getTransaction(ServerRequest serverRequest){
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(bridgeFundService.getTransaction(token), BridgeFunds.class);
+    }
+
 }
