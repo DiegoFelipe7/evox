@@ -1,7 +1,6 @@
 package com.evox.evox.handler;
 
 import com.evox.evox.dto.ListBridgeFundUsersDto;
-import com.evox.evox.dto.ListSyntheticUsersDto;
 import com.evox.evox.model.*;
 import com.evox.evox.model.enums.AccountState;
 import com.evox.evox.services.BridgeFundService;
@@ -101,5 +100,11 @@ public class BridgeFundsHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(bridgeFundService.getTransaction(token), BridgeFunds.class);
     }
+    //TODO:eliminar esto
+//    public Mono<ServerResponse> getTransactionaaaaaaa(ServerRequest serverRequest){
+//        return ServerResponse.ok()
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(bridgeFundService.registerPayment(), Payments.class);
+//    }
 
 }

@@ -1,18 +1,14 @@
 package com.evox.evox.services;
 
-import com.evox.evox.dto.ListAccountBridgeFundsDto;
-import com.evox.evox.dto.ListBridgeFundUsersDto;
-import com.evox.evox.dto.ListSyntheticUsersDto;
+import com.evox.evox.dto.*;
 import com.evox.evox.exception.CustomException;
 import com.evox.evox.model.*;
 import com.evox.evox.model.enums.AccountState;
-import com.evox.evox.model.enums.State;
-import com.evox.evox.repository.BridgeAccountTypeRepository;
-import com.evox.evox.repository.BridgeFundsAccountRepository;
-import com.evox.evox.repository.BridgeFundsRepository;
-import com.evox.evox.repository.UserRepository;
+import com.evox.evox.model.enums.PaymentsState;
+import com.evox.evox.repository.*;
 import com.evox.evox.security.jwt.JwtProvider;
 import com.evox.evox.utils.Response;
+import com.evox.evox.utils.Utils;
 import com.evox.evox.utils.enums.TypeStateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -33,26 +30,43 @@ public class BridgeFundService {
     private final BridgeFundsAccountRepository bridgeFundsAccountRepository;
     private final UserRepository userRepository;
     private final BridgeFundsRepository bridgeFundsRepository;
+    private final PaymentsRepository paymentsRepository;
     private final JwtProvider jwtProvider;
+    public static final  Integer bonus = 4;
 
     public Flux<BridgeAccountType> getBridgeAccountType() {
         return bridgeAccountTypeRepository.findAll()
                 .sort(Comparator.comparing(BridgeAccountType::getPrice));
     }
-
-
-
     public Mono<BridgeFunds> accountActivation(String transaction) {
         return bridgeFundsRepository.findByTransactionEqualsIgnoreCase(transaction)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Esta codigo de transaccion no existe!", TypeStateResponse.Warning)))
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Este código de transacción no existe!", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setBridgeFundsState(AccountState.Verified);
                     ele.setState(true);
                     ele.setUpdatedAt(LocalDateTime.now());
-                    return bridgeFundsRepository.save(ele);
+                    return registerPayment(ele.getUserId(), ele.getTransaction(), ele.getTotal())
+                            .then(bridgeFundsRepository.save(ele))
+                            .onErrorMap(throwable -> new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar los datos.", TypeStateResponse.Error));
                 });
     }
+
+    public Mono<Void> registerPayment(Integer userId, String transaction, BigDecimal total) {
+        BigDecimal size = total.divide(BigDecimal.TEN, 0, RoundingMode.HALF_UP);
+        return userRepository.findById(userId)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario es incorrecto", TypeStateResponse.Error)))
+                .flatMapMany(user -> userRepository.findUserAndParents(user.getUsername(), this.bonus))
+                .flatMap(data -> {
+                    BigDecimal payment = size.multiply(BigDecimal.valueOf(Utils.bonus(data.getLevel()))).setScale(0, RoundingMode.HALF_UP);
+                    Payments payments = new Payments(Utils.uid(), transaction, "Bridge Funds", data.getId(), payment, PaymentsState.Pending);
+                    return paymentsRepository.save(payments)
+                            .onErrorResume(throwable -> Mono.empty());
+                })
+                .then();
+    }
+
+
 
     public Mono<AccountState> getStateUser(String token) {
         String username = jwtProvider.extractToken(token);
@@ -68,8 +82,8 @@ public class BridgeFundService {
         String username = jwtProvider.extractToken(token);
         return userRepository.findByUsername(username)
                 .flatMap(ele -> bridgeFundsRepository.findAll()
-                            .filter(data -> data.getUserId().equals(ele.getId()) && data.getBridgeFundsState().equals(AccountState.Error))
-                            .next());
+                        .filter(data -> data.getUserId().equals(ele.getId()) && data.getBridgeFundsState().equals(AccountState.Error))
+                        .next());
     }
 
     public Mono<Response> registrationTransaction(BridgeFunds bridgeFunds, String token) {
@@ -170,6 +184,4 @@ public class BridgeFundService {
                 );
     }
 
-
 }
-

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class SupportService {
@@ -74,8 +76,13 @@ public class SupportService {
     public Mono<Response> editSupport(Support support, Integer id) {
         return supportRepository.findById(id)
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No existe un ticket de soporte con esta informacion!", TypeStateResponse.Warning)))
-                .flatMap(ele -> supportRepository.save(support)
-                        .thenReturn(new Response(TypeStateResponse.Success, "Mensaje enviado")));
+                .flatMap(ele -> {
+                    ele.setUpdatedAt(LocalDateTime.now());
+                    ele.setAnswer(support.getAnswer());
+                    ele.setState(State.Reply);
+                    return supportRepository.save(ele)
+                            .thenReturn(new Response(TypeStateResponse.Success, "Mensaje enviado"));
+                });
     }
 
 

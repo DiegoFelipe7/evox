@@ -2,6 +2,7 @@ package com.evox.evox.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Table(name = "users")
+@ToString
 public class User implements UserDetails  {
     @Id
     private Integer id;

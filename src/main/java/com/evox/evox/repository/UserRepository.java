@@ -37,7 +37,7 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
             "  INNER JOIN user_team ut ON u.id = ut.parent_id\n" +
             ")\n" +
             "SELECT * FROM user_team\n" +
-            "WHERE level <= :level;")
+            "WHERE level <= :level and username <> :username;")
     Flux<User> findUserAndParents(@Param("username") String username , @Param("level") Integer level);
 
 
