@@ -40,6 +40,7 @@ public class User implements UserDetails  {
     private Boolean status;
     private Integer level;
     private Integer accountSynthetics;
+    private String evoxWallet;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

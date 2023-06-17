@@ -21,7 +21,9 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +34,14 @@ public class BridgeFundService {
     private final BridgeFundsRepository bridgeFundsRepository;
     private final PaymentsRepository paymentsRepository;
     private final JwtProvider jwtProvider;
-    public static final  Integer bonus = 4;
+    public static final Integer bonus = 4;
 
     public Flux<BridgeAccountType> getBridgeAccountType() {
         return bridgeAccountTypeRepository.findAll()
                 .sort(Comparator.comparing(BridgeAccountType::getPrice));
     }
+
+
     public Mono<BridgeFunds> accountActivation(String transaction) {
         return bridgeFundsRepository.findByTransactionEqualsIgnoreCase(transaction)
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Este código de transacción no existe!", TypeStateResponse.Warning)))
@@ -48,7 +52,7 @@ public class BridgeFundService {
                     ele.setUpdatedAt(LocalDateTime.now());
                     return registerPayment(ele.getUserId(), ele.getTransaction(), ele.getTotal())
                             .then(bridgeFundsRepository.save(ele))
-                            .onErrorMap(throwable -> new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar los datos.", TypeStateResponse.Error));
+                            .onErrorMap(throwable -> new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "Error activando la cuenta.", TypeStateResponse.Error));
                 });
     }
 
@@ -65,7 +69,6 @@ public class BridgeFundService {
                 })
                 .then();
     }
-
 
 
     public Mono<AccountState> getStateUser(String token) {
@@ -102,7 +105,8 @@ public class BridgeFundService {
                                     bridgeFunds.setUserId(user.getId());
                                     return bridgeFunds;
                                 })
-                                .flatMap(bridgeFundsRepository::save).map(savedBridgeFunds -> new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!"))
+                                .flatMap(bridgeFundsRepository::save)
+                                .map(savedBridgeFunds -> new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!"))
 
                         ).cast(Response.class)
                 );
@@ -143,7 +147,7 @@ public class BridgeFundService {
                                 dto.setState(bridgeFunds.getState());
                                 return dto;
                             });
-                });
+                }).sort(Comparator.comparing(ListBridgeFundUsersDto::getId));
     }
 
     public Mono<Response> saveAccountBridgeFunds(List<BridgeFundsAccount> bridgeFundsAccounts, Integer id) {

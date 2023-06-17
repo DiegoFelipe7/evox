@@ -22,6 +22,7 @@ public class RouterUser {
                 .GET(PATH+"syntheticsAccount" , handler::getAccountSynthetic)
                 .GET(PATH+"account", handler::account)
                 .POST(PATH+"seedEmail" , handler::seedEmail)
+                .PATCH(PATH+"registerWallet" , handler::saveWallet)
                 .build();
     }
 }

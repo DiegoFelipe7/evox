@@ -100,11 +100,5 @@ public class BridgeFundsHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(bridgeFundService.getTransaction(token), BridgeFunds.class);
     }
-    //TODO:eliminar esto
-//    public Mono<ServerResponse> getTransactionaaaaaaa(ServerRequest serverRequest){
-//        return ServerResponse.ok()
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .body(bridgeFundService.registerPayment(), Payments.class);
-//    }
 
 }

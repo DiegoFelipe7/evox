@@ -94,5 +94,19 @@ public class UserServices {
                         .then(Mono.just(new Response(TypeStateResponse.Success, "Hemos enviado un correo electrónico para la activacion de tu cuenta!" + ele.getFullName()))));
     }
 
+    public Mono<Response> saveWallet(String token, String evoxWallet) {
+        String username = jwtProvider.extractToken(token);
+        return repository.findAll()
+                .filter(data -> data.getEvoxWallet().equals(evoxWallet))
+                .next()
+                .flatMap(err -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Ya existe una billetera con estos valores!", TypeStateResponse.Error)))
+                .flatMap(res -> repository.findByUsername(username)
+                        .flatMap(ele -> {
+                            ele.setId(ele.getId());
+                            ele.setEvoxWallet(evoxWallet);
+                            return repository.save(ele)
+                                    .thenReturn(new Response(TypeStateResponse.Success, "Billetera registrada"));
+                        }));
 
+    }
 }

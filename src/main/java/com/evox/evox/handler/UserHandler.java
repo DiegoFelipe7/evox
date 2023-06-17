@@ -75,4 +75,13 @@ public class UserHandler {
 
     }
 
+    public Mono<ServerResponse> saveWallet(ServerRequest serverRequest) {
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return serverRequest.bodyToMono(User.class)
+                .flatMap(ele -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(userServices.saveWallet(token, ele.getEvoxWallet()), Response.class));
+
+    }
+
 }

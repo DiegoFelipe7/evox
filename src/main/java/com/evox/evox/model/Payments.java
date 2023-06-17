@@ -23,7 +23,7 @@ public class Payments {
     private Integer userId;
     private BigDecimal total;
     private String currency;
-    private Boolean state;
+    private Boolean status;
     private PaymentsState paymentsState;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

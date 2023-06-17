@@ -22,7 +22,6 @@ public class RouterBridgeFunds {
                 .GET(PATH+"validateRegistration/{id}" , handler::validateRegistration)
                 .GET(PATH+"list/users" , handler::getAllBridgeFundsUsers)
                 .GET(PATH+"transaction" , handler::getTransaction)
-//                .POST(PATH+"prueba" , handler::getTransactionaaaaaaa)
                 .POST(PATH+"saveTransaction" , handler::registrationTransaction)
                 .PATCH(PATH+"active/{transaction}" , handler::activateAccount)
                 .PATCH(PATH+"invalid/{transaction}" , handler::invalidTransaction)

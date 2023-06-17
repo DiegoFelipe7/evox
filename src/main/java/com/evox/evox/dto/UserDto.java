@@ -30,6 +30,7 @@ public class UserDto {
     private Integer parentId;
     private Boolean status;
     private Integer level;
+    private String evoxWallet;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
