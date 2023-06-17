@@ -18,9 +18,10 @@ public class RouterUser {
                 .GET(PATH+"list" , handler::getAllUsers)
                 .GET(PATH +"referrals", handler::referrals)
                 .GET(PATH +"referrals/team", handler::referralsTeam)
-                .PUT(PATH+"edit",handler::updateUser)
                 .GET(PATH+"syntheticsAccount" , handler::getAccountSynthetic)
                 .GET(PATH+"account", handler::account)
+                .GET(PATH+"getUser",handler::getUserId)
+                .PUT(PATH+"edit",handler::updateUser)
                 .POST(PATH+"seedEmail" , handler::seedEmail)
                 .PATCH(PATH+"registerWallet" , handler::saveWallet)
                 .build();

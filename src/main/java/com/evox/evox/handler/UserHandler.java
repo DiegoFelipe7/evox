@@ -13,6 +13,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.security.PublicKey;
+
 
 @Component
 @Slf4j
@@ -48,7 +50,7 @@ public class UserHandler {
                 .bodyToMono(UserDto.class)
                 .flatMap(ele -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(userServices.editUser(ele), TokenDto.class));
+                        .body(userServices.editUser(ele), Response.class));
     }
 
 
@@ -82,6 +84,12 @@ public class UserHandler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(userServices.saveWallet(token, ele.getEvoxWallet()), Response.class));
 
+    }
+    public Mono<ServerResponse> getUserId(ServerRequest serverRequest){
+        String token = serverRequest.headers().firstHeader("Authorization");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userServices.getUserId(token),UserDto.class);
     }
 
 }

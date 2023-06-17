@@ -54,7 +54,7 @@ public class UserServices {
     }
 
 
-    public Mono<TokenDto> editUser(UserDto userDto) {
+    public Mono<Response> editUser(UserDto userDto) {
         return repository.findByEmail(userDto.getEmail())
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Se ha producido un error, inténtelo de nuevo.", TypeStateResponse.Warning)))
                 .flatMap(ele -> {
@@ -63,7 +63,8 @@ public class UserServices {
                     ele.setPhone(userDto.getPhone());
                     ele.setCountry(userDto.getCountry());
                     ele.setCity(userDto.getCity());
-                    return repository.save(ele).map(data -> new TokenDto(jwtProvider.generateToken(data)));
+                    return repository.save(ele)
+                            .thenReturn(new Response(TypeStateResponse.Success, "Datos actualizados"));
                 });
     }
 
@@ -108,5 +109,10 @@ public class UserServices {
                                     .thenReturn(new Response(TypeStateResponse.Success, "Billetera registrada"));
                         }));
 
+    }
+    public Mono<UserDto> getUserId(String token){
+        String username = jwtProvider.extractToken(token);
+        return repository.findByUsername(username)
+                .map(ele->modelMapper.map(ele,UserDto.class));
     }
 }
