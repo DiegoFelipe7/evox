@@ -28,7 +28,6 @@ public class JwtProvider {
         claims.put("fullName", user.getFullName());
         claims.put("state", userDetails.isEnabled());
         claims.put("roles", userDetails.getAuthorities());
-        claims.put("refLink", user.getRefLink());
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date())

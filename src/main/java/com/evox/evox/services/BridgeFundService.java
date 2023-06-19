@@ -4,6 +4,7 @@ import com.evox.evox.dto.*;
 import com.evox.evox.exception.CustomException;
 import com.evox.evox.model.*;
 import com.evox.evox.model.enums.AccountState;
+import com.evox.evox.model.enums.Category;
 import com.evox.evox.model.enums.PaymentsState;
 import com.evox.evox.repository.*;
 import com.evox.evox.security.jwt.JwtProvider;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 public class BridgeFundService {
-    private final BridgeAccountTypeRepository bridgeAccountTypeRepository;
+    private final PackagesAccountsRepository packagesAccountsRepository;
     private final BridgeFundsAccountRepository bridgeFundsAccountRepository;
     private final UserRepository userRepository;
     private final BridgeFundsRepository bridgeFundsRepository;
@@ -36,9 +37,10 @@ public class BridgeFundService {
     private final JwtProvider jwtProvider;
     public static final Integer bonus = 4;
 
-    public Flux<BridgeAccountType> getBridgeAccountType() {
-        return bridgeAccountTypeRepository.findAll()
-                .sort(Comparator.comparing(BridgeAccountType::getPrice));
+    public Flux<PackagesAccounts> getBridgeAccountType() {
+        return packagesAccountsRepository.findAll()
+                .filter(ele->ele.getCategory().equals(Category.BridgeFunds))
+                .sort(Comparator.comparing(PackagesAccounts::getPrice));
     }
 
 
@@ -95,7 +97,7 @@ public class BridgeFundService {
                 .flatMap(user -> bridgeFundsRepository.findByTransactionEqualsIgnoreCase(bridgeFunds.getTransaction())
                         .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
                                 "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
-                        .switchIfEmpty(bridgeAccountTypeRepository.findById(bridgeFunds.getBridgeAccountId())
+                        .switchIfEmpty(packagesAccountsRepository.findById(bridgeFunds.getBridgeAccountId())
                                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "No se seleccionó un tipo de cuenta", TypeStateResponse.Warning)))
                                 .map(ele -> {
                                     bridgeFunds.setType("Bridge Funds");
@@ -129,19 +131,19 @@ public class BridgeFundService {
         return bridgeFundsRepository.findAll()
                 .flatMap(bridgeFunds -> {
                     Mono<User> userMono = userRepository.findById(bridgeFunds.getUserId());
-                    Mono<BridgeAccountType> bridgeAccountTypeMono = bridgeAccountTypeRepository.findById(bridgeFunds.getBridgeAccountId());
+                    Mono<PackagesAccounts> bridgeAccountTypeMono = packagesAccountsRepository.findById(bridgeFunds.getBridgeAccountId());
                     return Mono.zip(userMono, bridgeAccountTypeMono)
                             .map(tuple -> {
                                 User user = tuple.getT1();
-                                BridgeAccountType bridgeAccountType = tuple.getT2();
+                                PackagesAccounts packagesAccounts = tuple.getT2();
                                 ListBridgeFundUsersDto dto = new ListBridgeFundUsersDto();
                                 dto.setId(bridgeFunds.getId());
                                 dto.setTransaction(bridgeFunds.getTransaction());
-                                dto.setTitle(bridgeAccountType.getTitle());
-                                dto.setPrice(bridgeAccountType.getPrice());
+                                dto.setTitle(packagesAccounts.getTitle());
+                                dto.setPrice(packagesAccounts.getPrice());
                                 dto.setQuantity(bridgeFunds.getQuantity());
                                 dto.setTotal(bridgeFunds.getTotal());
-                                dto.setCurrency(bridgeAccountType.getCurrency());
+                                dto.setCurrency(packagesAccounts.getCurrency());
                                 dto.setUsername(user.getUsername());
                                 dto.setEmail(user.getEmail());
                                 dto.setState(bridgeFunds.getState());

@@ -28,7 +28,7 @@ public class BridgeFundsHandler {
     public Mono<ServerResponse> getAllBridgeAccountType(ServerRequest serverRequest){
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(bridgeFundService.getBridgeAccountType(), BridgeAccountType.class);
+                .body(bridgeFundService.getBridgeAccountType(), PackagesAccounts.class);
     }
 
 

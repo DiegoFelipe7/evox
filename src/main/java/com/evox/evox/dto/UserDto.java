@@ -31,7 +31,9 @@ public class UserDto {
     private Boolean status;
     private Integer level;
     private String evoxWallet;
+    @JsonIgnore
     private LocalDateTime createdAt;
+    @JsonIgnore
     private LocalDateTime updatedAt;
 
 }
