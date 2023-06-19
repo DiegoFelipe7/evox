@@ -64,8 +64,9 @@ public class BridgeFundService {
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "El usuario es incorrecto", TypeStateResponse.Error)))
                 .flatMapMany(user -> userRepository.findUserAndParents(user.getUsername(), this.bonus))
                 .flatMap(data -> {
+                    System.out.println(data.getLevel());
                     BigDecimal payment = size.multiply(BigDecimal.valueOf(Utils.bonus(data.getLevel()))).setScale(0, RoundingMode.HALF_UP);
-                    Payments payments = new Payments(Utils.uid(), transaction, "Bridge Funds", data.getId(), payment, PaymentsState.Pending);
+                    Payments payments = new Payments(Utils.uid(), transaction, Category.BridgeFunds,data.getLevel(), data.getId(), payment, PaymentsState.Pending);
                     return paymentsRepository.save(payments)
                             .onErrorResume(throwable -> Mono.empty());
                 })

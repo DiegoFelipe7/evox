@@ -1,5 +1,6 @@
 package com.evox.evox.model;
 
+import com.evox.evox.model.enums.Category;
 import com.evox.evox.model.enums.PaymentsState;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -19,7 +20,8 @@ public class Payments {
     private Integer id;
     private String idCommission;
     private String transaction;
-    private String concept;
+    private Category concept;
+    private Integer level;
     private Integer userId;
     private BigDecimal total;
     private String currency;
@@ -28,10 +30,11 @@ public class Payments {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Payments(String idCommission, String transaction, String concept, Integer userId, BigDecimal total, PaymentsState paymentsState) {
+    public Payments(String idCommission, String transaction, Category concept,Integer level, Integer userId, BigDecimal total, PaymentsState paymentsState) {
         this.idCommission = idCommission;
         this.transaction = transaction;
         this.concept = concept;
+        this.level=level;
         this.userId = userId;
         this.total = total;
         this.paymentsState = paymentsState;

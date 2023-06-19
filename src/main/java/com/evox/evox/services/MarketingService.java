@@ -3,6 +3,7 @@ package com.evox.evox.services;
 import com.evox.evox.exception.CustomException;
 import com.evox.evox.model.Marketing;
 import com.evox.evox.model.PackagesAccounts;
+import com.evox.evox.model.Synthetics;
 import com.evox.evox.model.enums.AccountState;
 import com.evox.evox.model.enums.Category;
 import com.evox.evox.repository.MarketingRepository;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+
 @Service
 @RequiredArgsConstructor
 public class MarketingService {
@@ -25,10 +29,29 @@ public class MarketingService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
+    public Mono<Marketing> accountActivation(String transaction) {
+        return marketingRepository.findByTransactionEqualsIgnoreCase(transaction)
+                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Esta codigo de transaccion no existe!", TypeStateResponse.Warning)))
+                .flatMap(ele -> {
+                    if (Boolean.TRUE.equals(ele.getState())) {
+                        return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "La cuenta ya está activa", TypeStateResponse.Warning));
+                    } else {
+                        ele.setId(ele.getId());
+                        ele.setMarketingState(AccountState.Verified);
+                        ele.setActivationDate(LocalDateTime.now());
+                        ele.setExpirationDate(ele.getCreatedAt().plusMonths(1));
+                        ele.setState(true);
+                        ele.setUpdatedAt(LocalDateTime.now());
+                        return marketingRepository.save(ele);
+                    }
+                });
+    }
+
 
     public Flux<PackagesAccounts> findAllMarketingAccount(){
         return packagesAccountsRepository.findAll()
-                .filter(ele->ele.getCategory().equals(Category.EvoxMarketing));
+                .filter(ele->ele.getCategory().equals(Category.EvoxMarketing))
+                .sort(Comparator.comparing(PackagesAccounts::getPrice));
     }
 
 
@@ -48,7 +71,7 @@ public class MarketingService {
 
     }
 
-    public Mono<AccountState> getStateUser(String token) {
+    public Mono<AccountState> getStateMarketingUser(String token) {
         String username = jwtProvider.extractToken(token);
         return userRepository.findByUsername(username)
                 .flatMap(user -> marketingRepository.findAll()
@@ -76,5 +99,6 @@ public class MarketingService {
                         .filter(ele -> ele.getUserId().equals(user.getId()) && ele.getMarketingState().equals(AccountState.Error))
                         .next());
     }
+
 
 }
