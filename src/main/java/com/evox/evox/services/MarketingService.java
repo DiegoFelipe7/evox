@@ -56,18 +56,26 @@ public class MarketingService {
 
 
     public Mono<Response> saveTransaction(Marketing marketing, String token) {
-        String username = jwtProvider.extractToken(token);
-        return userRepository.findByUsername(username)
-                .flatMap(user -> marketingRepository.findByTransactionEqualsIgnoreCase(marketing.getTransaction())
-                        .flatMap(existingSynthetics -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
-                                "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
-                        .switchIfEmpty(Mono.defer(() -> {
-                            marketing.setType("Evox Marketing");
-                            marketing.setMarketingState(AccountState.Pending);
-                            marketing.setUserId(user.getId());
-                            return marketingRepository.save(marketing);
-                        })) .thenReturn(new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!")));
-
+        return packagesAccountsRepository.findById(marketing.getMarketingAccountId())
+                .switchIfEmpty(Mono.error( new CustomException(HttpStatus.BAD_REQUEST, "El plan seleccionado es invalido!",TypeStateResponse.Warning)))
+                .flatMap(packagesAccount -> {
+                    var price = packagesAccount.getPrice();
+                    String username = jwtProvider.extractToken(token);
+                    return userRepository.findByUsername(username)
+                            .switchIfEmpty(Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
+                                    "No se encontró ningún usuario con el nombre de usuario dado", TypeStateResponse.Error)))
+                            .flatMap(user -> marketingRepository.findByTransactionEqualsIgnoreCase(marketing.getTransaction())
+                                    .flatMap(existingMarketing -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
+                                            "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
+                                    .switchIfEmpty(Mono.defer(() -> {
+                                        marketing.setType("Evox Marketing");
+                                        marketing.setPrice(price.intValue());
+                                        marketing.setMarketingState(AccountState.Pending);
+                                        marketing.setUserId(user.getId());
+                                        return marketingRepository.save(marketing);
+                                    })))
+                            .thenReturn(new Response(TypeStateResponse.Success, "Transacción registrada satisfactoriamente!"));
+                });
 
     }
 
@@ -86,6 +94,7 @@ public class MarketingService {
                 .flatMap(ele -> {
                     ele.setId(ele.getId());
                     ele.setMarketingState(AccountState.Error);
+                    ele.setState(false);
                     return marketingRepository.save(ele)
                             .thenReturn(new Response(TypeStateResponse.Success, "Transaccion invalidada!"));
                 });

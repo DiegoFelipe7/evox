@@ -29,6 +29,7 @@ public class SupportService {
         return supportRepository.findAll()
                 .flatMap(ele -> userRepository.findById(ele.getId())
                         .map(data -> new SupportDto(ele.getId(),
+                                ele.getTicket(),
                                 ele.getCategory(),
                                 ele.getQuestion(),
                                 ele.getAnswer(),
@@ -48,6 +49,7 @@ public class SupportService {
                 .flatMapMany(ele -> supportRepository.findAll()
                         .filter(data -> data.getUserId().equals(ele.getId()))
                         .map(support -> new SupportDto(support.getId(),
+                                support.getTicket(),
                                 support.getCategory(),
                                 support.getState(),
                                 support.getCreatedAt(),
