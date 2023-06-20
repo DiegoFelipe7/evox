@@ -51,6 +51,8 @@ public class SupportService {
                         .map(support -> new SupportDto(support.getId(),
                                 support.getTicket(),
                                 support.getCategory(),
+                                support.getQuestion(),
+                                support.getAnswer(),
                                 support.getState(),
                                 support.getCreatedAt(),
                                 support.getUpdatedAt())));

@@ -37,10 +37,12 @@ public class SupportDto {
         this.updatedAt = updatedAt;
     }
 
-    public SupportDto(Integer id, String ticket, String category, State state, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public SupportDto(Integer id, String ticket, String category, String question, String answer, State state, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.ticket=ticket;
         this.category = category;
+        this.question=question;
+        this.answer=answer;
         this.state = state;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
