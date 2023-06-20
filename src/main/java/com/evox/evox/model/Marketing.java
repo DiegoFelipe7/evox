@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class Marketing {
     @Id
     private Integer id;
+    private String title;
     private String type;
     private String transaction;
     private String currency;

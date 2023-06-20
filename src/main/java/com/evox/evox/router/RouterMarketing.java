@@ -16,9 +16,10 @@ public class RouterMarketing {
     RouterFunction<ServerResponse> marketingRouter(MarketingHandler handler){
         return RouterFunctions.route()
                 .GET(PATH+"list" , handler::marketingListAccount)
+                .GET(PATH+"getAll" , handler::getAllMarketing)
                 .GET(PATH+"accountStatus" , handler::marketingState)
-                .POST(PATH+"saveTransaction" , handler::saveMarketing)
                 .GET(PATH+"transaction" , handler::getMarketingId)
+                .POST(PATH+"saveTransaction" , handler::saveMarketing)
                 .PATCH(PATH+"active/{transaction}" , handler::activateAccount)
                 .PATCH(PATH+"invalid/{transaction}" , handler::invalidTransaction)
                 .build();

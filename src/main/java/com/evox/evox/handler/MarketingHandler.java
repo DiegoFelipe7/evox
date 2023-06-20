@@ -65,11 +65,11 @@ public class MarketingHandler {
     }
 
 
-    public Mono<ServerResponse> getSyntheticId(ServerRequest serverRequest){
+    public Mono<ServerResponse> getAllMarketing(ServerRequest serverRequest){
         String token = serverRequest.headers().firstHeader("Authorization");
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(marketingService.getIdEvoxMarketingUser(token), Synthetics.class);
+                .body(marketingService.getAllMarketing(), Synthetics.class);
     }
 
 }

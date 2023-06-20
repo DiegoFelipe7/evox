@@ -27,7 +27,7 @@ public class SupportService {
 
     public Flux<SupportDto> getAllSupport() {
         return supportRepository.findAll()
-                .flatMap(ele -> userRepository.findById(ele.getId())
+                .flatMap(ele -> userRepository.findById(ele.getUserId())
                         .map(data -> new SupportDto(ele.getId(),
                                 ele.getTicket(),
                                 ele.getCategory(),

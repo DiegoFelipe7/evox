@@ -47,6 +47,10 @@ public class MarketingService {
                 });
     }
 
+    public Flux<Marketing> getAllMarketing(){
+        return marketingRepository.findAll();
+    }
+
 
     public Flux<PackagesAccounts> findAllMarketingAccount(){
         return packagesAccountsRepository.findAll()
@@ -69,6 +73,7 @@ public class MarketingService {
                                             "Ya existe una transacción con estos valores", TypeStateResponse.Error)))
                                     .switchIfEmpty(Mono.defer(() -> {
                                         marketing.setType("Evox Marketing");
+                                        marketing.setTitle(packagesAccount.getTitle());
                                         marketing.setPrice(price.intValue());
                                         marketing.setMarketingState(AccountState.Pending);
                                         marketing.setUserId(user.getId());
@@ -108,6 +113,7 @@ public class MarketingService {
                         .filter(ele -> ele.getUserId().equals(user.getId()) && ele.getMarketingState().equals(AccountState.Error))
                         .next());
     }
+
 
 
 }
