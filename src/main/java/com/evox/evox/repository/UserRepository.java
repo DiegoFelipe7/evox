@@ -40,5 +40,6 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
             "WHERE level <= :level and username <> :username;")
     Flux<User> findUserAndParents(@Param("username") String username , @Param("level") Integer level);
 
+    Mono<User> findByEvoxWallet(String wallet);
 
 }

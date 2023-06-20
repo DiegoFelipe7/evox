@@ -97,23 +97,21 @@ public class UserServices {
 
     public Mono<Response> saveWallet(String token, String evoxWallet) {
         String username = jwtProvider.extractToken(token);
-        return repository.findAll()
-                .filter(data -> data.getEvoxWallet().equals(evoxWallet))
-                .next()
-                .flatMap(err -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Ya existe una billetera con estos valores!", TypeStateResponse.Error)))
-                .flatMap(res -> repository.findByUsername(username)
+        return repository.findByEvoxWallet(evoxWallet)
+                .flatMap(err -> Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Esta billetera ya está registrada!", TypeStateResponse.Error)))
+                .switchIfEmpty(repository.findByUsername(username)
                         .flatMap(ele -> {
                             ele.setId(ele.getId());
                             ele.setEvoxWallet(evoxWallet);
                             return repository.save(ele)
-                                    .thenReturn(new Response(TypeStateResponse.Success, "Billetera registrada"));
-                        }))
-                .onErrorResume(throwable -> Mono.just(new Response(TypeStateResponse.Error, "Error al vincular la billetera")));
-
+                                    .thenReturn(new Response(TypeStateResponse.Success, "Billetera registrada"))
+                                    .onErrorResume(throwable -> Mono.just(new Response(TypeStateResponse.Error, "Error al guardar la billetera")));
+                        })).cast(Response.class);
     }
-    public Mono<UserDto> getUserId(String token){
+
+    public Mono<UserDto> getUserId(String token) {
         String username = jwtProvider.extractToken(token);
         return repository.findByUsername(username)
-                .map(ele->modelMapper.map(ele,UserDto.class));
+                .map(ele -> modelMapper.map(ele, UserDto.class));
     }
 }
