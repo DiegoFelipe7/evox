@@ -107,7 +107,8 @@ public class UserServices {
                             ele.setEvoxWallet(evoxWallet);
                             return repository.save(ele)
                                     .thenReturn(new Response(TypeStateResponse.Success, "Billetera registrada"));
-                        }));
+                        }))
+                .onErrorResume(throwable -> Mono.just(new Response(TypeStateResponse.Error, "Error al vincular la billetera")));
 
     }
     public Mono<UserDto> getUserId(String token){
